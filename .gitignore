@@ -1,0 +1,10 @@
+node_modules/
+.next/
+dist/
+model/
+*.exe
+*.dmg
+*.AppImage
+.env.local
+.env
+.claude/
