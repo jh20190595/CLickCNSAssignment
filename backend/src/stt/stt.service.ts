@@ -1,9 +1,15 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { spawn, ChildProcess } from 'child_process';
 import * as path from 'path';
 import * as readline from 'readline';
 
-const MODEL_PATH = process.env.VOSK_MODEL_PATH ?? path.join(process.cwd(), 'model');
+const MODEL_PATH =
+  process.env.VOSK_MODEL_PATH ?? path.join(process.cwd(), 'model');
 const WORKER_SCRIPT = path.join(process.cwd(), 'stt_worker.py');
 
 interface PendingResult {
@@ -13,6 +19,7 @@ interface PendingResult {
 interface WorkerSession {
   process: ChildProcess;
   partialCallback: (text: string) => void;
+  segmentCallback: (text: string) => void;
   finalPending: PendingResult | null;
 }
 
@@ -34,6 +41,7 @@ export class SttService implements OnModuleInit, OnModuleDestroy {
   initRecognizer(
     clientId: string,
     onPartial: (text: string) => void,
+    onSegment: (text: string) => void,
   ) {
     if (this.sessions.has(clientId)) return;
 
@@ -45,28 +53,31 @@ export class SttService implements OnModuleInit, OnModuleDestroy {
     const session: WorkerSession = {
       process: worker,
       partialCallback: onPartial,
+      segmentCallback: onSegment,
       finalPending: null,
     };
     this.sessions.set(clientId, session);
 
-    const rl = readline.createInterface({ input: worker.stdout! });
+    const rl = readline.createInterface({ input: worker.stdout });
     rl.on('line', (line) => {
       try {
-        const msg = JSON.parse(line);
+        const msg = JSON.parse(line) as { type?: string; text?: string };
         if (msg.type === 'partial' && msg.text) {
           session.partialCallback(msg.text);
+        } else if (msg.type === 'segment' && msg.text) {
+          session.segmentCallback(msg.text);
         } else if (msg.type === 'final') {
           session.finalPending?.resolve(msg.text ?? '');
           session.finalPending = null;
         } else if (msg.type === 'error') {
-          this.logger.error(`Worker error [${clientId}]: ${msg.text}`);
+          this.logger.error(`Worker error [${clientId}]: ${msg.text ?? ''}`);
         }
       } catch {
         // JSON 파싱 실패 무시
       }
     });
 
-    worker.stderr!.on('data', (d) =>
+    worker.stderr.on('data', (d: Buffer) =>
       this.logger.debug(`[worker:${clientId}] ${d.toString().trim()}`),
     );
 

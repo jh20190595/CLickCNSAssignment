@@ -41,7 +41,7 @@ Vosk 자체가 스트리밍 인식을 지원하기 때문에 WebSocket과 궁합
 ### `hooks/useStt.ts` — 핵심 로직이 다 여기 있다
 
 React 개발자가 가장 집중해서 볼 파일. 세 가지 일을 한다:
-1. WebSocket 연결 관리
+1. WebSocket 연결 관리1
 2. 마이크 오디오 캡처
 3. 오디오 포맷 변환 후 전송
 

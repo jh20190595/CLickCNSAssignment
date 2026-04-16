@@ -1,4 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+// app - 앱 전체 생명주기 관리
+// BrowserWindow - 창 생성
+// ipcMain - 메인 - 렌더러  프로세스 통신
+
 const path = require('path');
 
 const isDev = process.argv.includes('--dev');
