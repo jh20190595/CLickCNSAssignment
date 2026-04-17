@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 import { DEFAULT_SETTINGS } from "@/lib/settings";
 import type { AppSettings } from "@/lib/settings";
+import type { Utterance } from "@/lib/types";
 import { detectCommand } from "@/lib/voiceCommands";
 
 export type SttStatus = "idle" | "connecting" | "recording" | "processing" | "error";
@@ -52,6 +53,7 @@ export function useStt(options: UseSttOptions = {}) {
   const [fullTranscript, setFullTranscript] = useState<string>("");
   const [finalTexts, setFinalTexts] = useState<string[]>([]);
   const [partialText, setPartialText] = useState<string>("");
+  const [segments, setSegments] = useState<Utterance[]>([]);
   const [isPaused, setIsPaused] = useState(false);
 
   const socketRef = useRef<Socket | null>(null);
@@ -60,6 +62,7 @@ export function useStt(options: UseSttOptions = {}) {
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const finalsRef = useRef<string[]>([]);
+  const lastPartialRef = useRef<string>("");
   const pausedRef = useRef(false);
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -72,8 +75,8 @@ export function useStt(options: UseSttOptions = {}) {
   const emitSettings = useCallback(() => {
     const s = settingsRef.current;
     socketRef.current?.emit("settings_update", {
-      numberCall: s.postprocess.numberCall,
       dateFormat: s.postprocess.dateFormat,
+      speakerLabel: s.postprocess.speakerLabel,
     });
   }, []);
 
@@ -93,11 +96,16 @@ export function useStt(options: UseSttOptions = {}) {
     });
 
     socket.on("transcript_partial", ({ text }: { text: string }) => {
-      setPartialText(text ?? "");
+      console.warn("[stt] <- partial:", JSON.stringify(text));
+      const t = text ?? "";
+      if (t) lastPartialRef.current = t;
+      setPartialText(t);
     });
 
     socket.on("transcript_final", ({ text }: { text: string }) => {
+      console.warn("[stt] <- final:", JSON.stringify(text));
       if (!text) return;
+      lastPartialRef.current = "";
       const match = detectCommand(text, settingsRef.current.voiceCommands);
       if (match) {
         if (match.cleanedText) {
@@ -118,25 +126,40 @@ export function useStt(options: UseSttOptions = {}) {
       setPartialText("");
     });
 
-    socket.on("transcript_complete", ({ text }: { text: string }) => {
-      const fallback = finalsRef.current.join(" ");
-      const cleaned = stripCommandWords(
-        text ?? fallback,
-        settingsRef.current.voiceCommands,
-      );
-      setFullTranscript(cleaned);
-      setPartialText("");
-      setStatus("idle");
-    });
+    socket.on(
+      "transcript_complete",
+      ({
+        text,
+        segments: incomingSegments,
+      }: {
+        text: string;
+        segments?: Utterance[];
+      }) => {
+        console.warn("[stt] <- complete:", JSON.stringify(text));
+        const joined = finalsRef.current.join(" ").trim();
+        const best = text || joined || lastPartialRef.current;
+        const cleaned = stripCommandWords(
+          best,
+          settingsRef.current.voiceCommands,
+        );
+        setFullTranscript(cleaned);
+        setSegments(Array.isArray(incomingSegments) ? incomingSegments : []);
+        setPartialText("");
+        setStatus("idle");
+      },
+    );
   }, [emitSettings]);
 
   const startRecording = useCallback(async () => {
+    console.warn("[stt] startRecording: begin");
     setError(null);
     setStatus("connecting");
     setFullTranscript("");
     setFinalTexts([]);
     setPartialText("");
+    setSegments([]);
     finalsRef.current = [];
+    lastPartialRef.current = "";
 
     connect();
 
@@ -157,6 +180,10 @@ export function useStt(options: UseSttOptions = {}) {
 
       const audioContext = new AudioContext({ sampleRate: SAMPLE_RATE });
       audioContextRef.current = audioContext;
+      if (audioContext.state === "suspended") {
+        await audioContext.resume();
+      }
+      console.warn("[stt] AudioContext state=", audioContext.state, "actualRate=", audioContext.sampleRate);
 
       const source = audioContext.createMediaStreamSource(stream);
       const gainNode = audioContext.createGain();
@@ -166,16 +193,30 @@ export function useStt(options: UseSttOptions = {}) {
       const processor = audioContext.createScriptProcessor(CHUNK_SIZE, 1, 1);
       processorRef.current = processor;
 
+      let chunkCount = 0;
       processor.onaudioprocess = (e) => {
         if (pausedRef.current) return;
         const float32 = e.inputBuffer.getChannelData(0);
         let sum = 0;
-        for (let i = 0; i < float32.length; i++) sum += float32[i];
+        let peak = 0;
+        for (let i = 0; i < float32.length; i++) {
+          sum += float32[i];
+          const abs = Math.abs(float32[i]);
+          if (abs > peak) peak = abs;
+        }
         const dc = sum / float32.length;
         const int16 = new Int16Array(float32.length);
         for (let i = 0; i < float32.length; i++) {
           const s = Math.max(-1, Math.min(1, float32[i] - dc));
           int16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+        }
+        chunkCount++;
+        if (chunkCount % 20 === 0) {
+          console.warn(
+            "[stt] chunks=", chunkCount,
+            "peak=", peak.toFixed(3),
+            "socketConnected=", socketRef.current?.connected,
+          );
         }
         socketRef.current?.emit("audio_chunk", int16.buffer);
       };
@@ -188,7 +229,8 @@ export function useStt(options: UseSttOptions = {}) {
       pausedRef.current = false;
       setIsPaused(false);
       setStatus("recording");
-    } catch {
+    } catch (err) {
+      console.error("[stt] startRecording failed:", err);
       setStatus("error");
       setError("마이크 접근 권한이 필요합니다.");
     }
@@ -213,7 +255,10 @@ export function useStt(options: UseSttOptions = {}) {
     setTimeout(() => {
       setStatus((current) => {
         if (current !== "processing") return current;
-        setFullTranscript((prev) => prev || finalsRef.current.join(" "));
+        setFullTranscript(
+          (prev) =>
+            prev || finalsRef.current.join(" ") || lastPartialRef.current,
+        );
         return "idle";
       });
     }, 1500);
@@ -235,6 +280,7 @@ export function useStt(options: UseSttOptions = {}) {
     setFullTranscript("");
     setFinalTexts([]);
     setPartialText("");
+    setSegments([]);
     finalsRef.current = [];
   }, []);
 
@@ -250,8 +296,14 @@ export function useStt(options: UseSttOptions = {}) {
   useEffect(() => {
     connect();
     return () => {
-      socketRef.current?.disconnect();
+      const socket = socketRef.current;
       socketRef.current = null;
+      if (!socket) return;
+      if (socket.connected) {
+        socket.disconnect();
+      } else {
+        socket.once("connect", () => socket.disconnect());
+      }
     };
   }, [connect]);
 
@@ -297,6 +349,7 @@ export function useStt(options: UseSttOptions = {}) {
     fullTranscript,
     finalTexts,
     partialText,
+    segments,
     isPaused,
     startRecording,
     stopRecording,

@@ -10,9 +10,13 @@ import {
 } from "@/lib/exportFormat";
 
 interface ExportMenuProps {
+  /** 파일명(`filenameFor`)과 출력 머리말에 들어갈 환자 정보 */
   patient: Patient;
+  /** 출력에 포함할 초진/재진 + 주증상 */
   meta: SessionMeta;
+  /** 본문이 될 S/O/A/P 값 */
   soap: Soap;
+  /** MD 파일 다운로드 시 말미에 덧붙일 원본 전사 */
   rawTranscript: string;
 }
 
@@ -60,12 +64,12 @@ export function ExportMenu({ patient, meta, soap, rawTranscript }: ExportMenuPro
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="px-3 py-1.5 text-sm bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-md transition-colors"
+        className="px-3 py-1.5 text-sm bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-md transition-colors dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
       >
         {copied ? "복사됨" : "내보내기 ▾"}
       </button>
       {open && (
-        <div className="absolute right-0 bottom-full mb-2 w-44 bg-white border border-slate-200 rounded-md shadow-lg py-1 z-10">
+        <div className="absolute right-0 bottom-full mb-2 w-44 bg-white border border-slate-200 rounded-md shadow-lg py-1 z-10 dark:bg-slate-900 dark:border-slate-700">
           <MenuItem onClick={copyMarkdown}>전체 복사 (Markdown)</MenuItem>
           <MenuItem onClick={downloadMd}>Markdown 파일</MenuItem>
           <MenuItem onClick={downloadTxt}>TXT 파일</MenuItem>
@@ -79,13 +83,15 @@ function MenuItem({
   onClick,
   children,
 }: {
+  /** 메뉴 항목 클릭 시 호출 (복사/다운로드 액션) */
   onClick: () => void;
+  /** 항목 라벨 텍스트 */
   children: React.ReactNode;
 }) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+      className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors dark:text-slate-200 dark:hover:bg-slate-800"
     >
       {children}
     </button>

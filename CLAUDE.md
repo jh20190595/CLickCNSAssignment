@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 실시간 한국어 음성 → SOAP 진료 기록 데스크탑 앱.
-환자를 선택하고 녹음하면 Vosk가 텍스트로 전사하고, 후처리 파이프라인으로 약어·단위·날짜·번호 호출을 정규화한 뒤, LLM이 SOAP 4섹션(Subjective/Objective/Assessment/Plan)으로 자동 분류한다. 사용자는 편집·저장·내보내기(MD/TXT)까지 한 화면에서 수행한다.
+환자를 선택하고 녹음하면 Vosk가 텍스트로 전사하고, 후처리 파이프라인으로 약어·단위·날짜를 정규화한 뒤, LLM이 SOAP 4섹션(Subjective/Objective/Assessment/Plan)으로 자동 분류한다. 사용자는 편집·저장·내보내기(MD/TXT)까지 한 화면에서 수행한다.
 
 **스택:** NestJS (backend) · Next.js 15 App Router (frontend) · Electron (desktop shell) · Vosk (STT) · Anthropic/OpenAI (SOAP 분류) · Docker + Kubernetes
 
@@ -74,7 +74,7 @@ Electron ─▶ Next.js (http://localhost:3000)
 |------|--------|--------|------|
 | Client → Server | `audio_chunk` | `ArrayBuffer` (Int16 PCM) | 녹음 중 청크 전송 |
 | Client → Server | `audio_end` | — | 녹음 종료 신호 |
-| Client → Server | `settings_update` | `{ numberCall, dateFormat }` | 후처리 옵션 갱신 |
+| Client → Server | `settings_update` | `{ dateFormat, speakerLabel }` | 후처리 옵션 갱신 |
 | Server → Client | `transcript_partial` | `{ text: string }` | 중간 인식 결과 |
 | Server → Client | `transcript_final` | `{ text: string }` | 문장 확정 (세그먼트) |
 | Server → Client | `transcript_complete` | `{ raw: string, text: string }` | 세션 종료 후 후처리 완료 |
@@ -84,7 +84,7 @@ Electron ─▶ Next.js (http://localhost:3000)
 - `main.ts` — CORS 전체 허용, port 3001
 - `app.module.ts` — `SttModule` + `LlmModule`
 - `stt/` — STT 도메인 (Vosk Python worker 구동). 자세한 내용은 `backend/src/CLAUDE.md`
-- `postprocess/` — 전사 결과 정규화 파이프라인 (약어 → 단위 → 날짜 → 번호 호출 → 공백 정리)
+- `postprocess/` — 전사 결과 정규화 파이프라인 (약어 → 단위 → 날짜 → 공백 정리)
 - `llm/` — `POST /llm/soap` 엔드포인트. `ANTHROPIC_API_KEY` 또는 `OPENAI_API_KEY` 중 있는 쪽 사용, 없으면 transcript를 S 섹션에 복사
 
 **Vosk 모델 경로:** `backend/model/` (Docker에서는 `/app/model`). 모델이 없으면 STT 비활성화. 현재 `vosk-model-small-ko-0.22` (83MB) 사용 중.
@@ -115,7 +115,7 @@ Electron ─▶ Next.js (http://localhost:3000)
 - **Patient** — 이름 + 환자코드. `localStorage(soap.patients.v1)`
 - **Session** — 환자별 진료 한 건. `meta(visitType, chiefComplaint)` + `rawTranscript` + `soap`. `localStorage(soap.sessions.v2)`
 - **Soap** — `{ subjective, objective, assessment, plan }`
-- **AppSettings** — `localStorage(soap.settings.v1)`. `postprocess(numberCall, dateFormat)` + `audio(deviceId, gain)` + `voiceCommands(enabled, stopWord, newlineWord)` + `shortcuts(toggleRecord, newline)`
+- **AppSettings** — `localStorage(soap.settings.v1)`. `postprocess(dateFormat, speakerLabel)` + `audio(deviceId, gain)` + `voiceCommands(enabled, stopWord, newlineWord)` + `shortcuts(toggleRecord, newline, copyCC/S/O/A/P)`
 
 ## Key Constraints
 

@@ -15,7 +15,7 @@ NestJS 서버. 진입점 `main.ts`, 도메인은 `stt/`, `llm/`, `postprocess/` 
 - **stt.gateway.ts** — socket.io 게이트웨이(namespace `/stt`). 클라이언트별로 세그먼트 버퍼 + 후처리 옵션 맵을 유지.
   - `handleConnection` → `initRecognizer`로 worker 기동, partial/final 콜백 등록
   - `@SubscribeMessage('audio_chunk')` → worker에 Int16 PCM 전달
-  - `@SubscribeMessage('settings_update')` → `PostprocessOptions`(`numberCall`, `dateFormat`) 저장
+  - `@SubscribeMessage('settings_update')` → `PostprocessOptions`(`dateFormat`) + `speakerLabel` 저장
   - `@SubscribeMessage('audio_end')` → worker `finalizeResult` → 누적 세그먼트 join → `runPostprocess(raw, options)` → `transcript_complete { raw, text }` emit
   - `handleDisconnect` → 모든 상태 정리 + worker 종료
 - **stt.service.ts** — 클라이언트별 `stt_worker.py` 자식 프로세스 Map 관리. 바이너리 프로토콜(1B 타입 + 4B BE 길이 + payload)로 stdin에 써주고, stdout JSON 라인(`partial`/`segment`/`final`/`error`)을 파싱해 gateway 콜백으로 전달. 모델 경로는 `VOSK_MODEL_PATH` env (기본 `cwd/model`).
@@ -23,13 +23,13 @@ NestJS 서버. 진입점 `main.ts`, 도메인은 `stt/`, `llm/`, `postprocess/` 
 
 ## `postprocess/` — 전사 결과 정규화
 
-`runPostprocess(raw, options?)` 하나로 외부에 노출. 내부 순서: 약어 → 단위 → 날짜 → 번호 호출 → 공백 정리.
+`runPostprocess(raw, options?)` 하나로 외부에 노출. 내부 순서: 약어 → 단위 → 날짜 → 공백 정리.
 
 - **pipeline.ts** — `runPostprocess` + `PostprocessOptions` 타입. `tidyWhitespace`는 줄바꿈을 보존하며 공백만 정리.
 - **abbreviations.ts** — 한국어 음성 발화 의학 약어를 영문으로 치환 (`에이치티엔` → `HTN`, `디엠` → `DM` 등). 긴 키부터 매칭.
 - **units.ts** — 숫자+단위 결합 (`5 센티미터` → `5cm`, `120 슬래시 80` → `120/80`, `37 도` → `37°C`).
 - **dates.ts** — 한글 수사(`이천이십육년 사월 십육일`) → 숫자 날짜 정규화. 연·월·일 3요소 모두 있을 때만 `DateFormat`(`korean`/`iso`/`dot`/`english`)에 따라 최종 포맷 변환.
-- **numberCall.ts** — 옵션 `enabled` 시 "일/이/삼..." 발화의 등장 순서를 `1./2./3.`로 치환. `separator`(`.`|`)`|`-`), `autoNewline`, `smallNumber`(①②③, 1~10만) 지원.
+- **speakerLabel.ts** — 옵션 활성 시 문장 배열을 LLM에 보내 각 발화를 `doctor`/`patient`로 라벨링.
 - **pipeline.spec.ts** — 파이프라인 단위 테스트 (옵션 조합, 포맷 분기 확인).
 
 ## `llm/` — SOAP 분류 (HTTP)

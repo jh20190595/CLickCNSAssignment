@@ -1,7 +1,9 @@
 "use client";
 
 interface Props {
+  /** 클릭 시 호출 — 상위에서 SettingsModal 열기 */
   onClick: () => void;
+  /** true면 비활성화 (반투명 + cursor-not-allowed). 현재는 항상 활성 */
   disabled?: boolean;
 }
 
@@ -13,7 +15,7 @@ export function SettingsButton({ onClick, disabled }: Props) {
       disabled={disabled}
       aria-label="설정"
       title="설정"
-      className="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 disabled:opacity-40 disabled:cursor-not-allowed transition"
+      className="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 disabled:opacity-40 disabled:cursor-not-allowed transition"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
