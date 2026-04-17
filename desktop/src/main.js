@@ -137,6 +137,7 @@ function setupAutoUpdater() {
 
   autoUpdater.on('error', (err) => {
     console.error('Auto-update error:', err.message);
+    if (err.message && /404|HttpError/.test(err.message)) return;
     dialog.showMessageBox({
       type: 'error',
       title: '업데이트 오류',
