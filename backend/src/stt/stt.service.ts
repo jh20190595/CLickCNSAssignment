@@ -10,7 +10,10 @@ import * as readline from 'readline';
 
 const MODEL_PATH =
   process.env.VOSK_MODEL_PATH ?? path.join(process.cwd(), 'model');
-const WORKER_SCRIPT = path.join(process.cwd(), 'stt_worker.py');
+const WORKER_SCRIPT =
+  process.env.STT_WORKER_PATH ?? path.join(process.cwd(), 'stt_worker.py');
+const PYTHON_CMD =
+  process.env.BUNDLED_PYTHON ?? (process.platform === 'win32' ? 'python' : 'python3');
 
 interface PendingResult {
   resolve: (text: string) => void;
@@ -45,7 +48,7 @@ export class SttService implements OnModuleInit, OnModuleDestroy {
   ) {
     if (this.sessions.has(clientId)) return;
 
-    const worker = spawn('python3', [WORKER_SCRIPT], {
+    const worker = spawn(PYTHON_CMD, [WORKER_SCRIPT], {
       env: { ...process.env, VOSK_MODEL_PATH: MODEL_PATH },
       stdio: ['pipe', 'pipe', 'pipe'],
     });

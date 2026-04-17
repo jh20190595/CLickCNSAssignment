@@ -6,11 +6,17 @@ import {
   Logger,
   Post,
 } from '@nestjs/common';
-import { LlmService, SoapMeta, SoapResult } from './llm.service';
+import {
+  LlmService,
+  SoapMeta,
+  SoapResult,
+  Utterance,
+} from './llm.service';
 
 interface SoapRequestBody {
   transcript: string;
   meta?: SoapMeta;
+  segments?: Utterance[];
 }
 
 @Controller('llm')
@@ -25,7 +31,10 @@ export class LlmController {
       throw new HttpException('transcript is required', HttpStatus.BAD_REQUEST);
     }
     try {
-      return await this.llm.classifySoap(body.transcript, body.meta ?? {});
+      return await this.llm.classifySoap(body.transcript, {
+        meta: body.meta ?? {},
+        segments: body.segments,
+      });
     } catch (e) {
       this.logger.error(e instanceof Error ? e.message : String(e));
       throw new HttpException(

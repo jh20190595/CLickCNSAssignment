@@ -59,9 +59,14 @@ def pick_best_text(result: dict) -> str:
     """
     alts = result.get("alternatives")
     if alts:
+        # nbest 1순위가 confidence는 높지만 text가 비어 있는 경우가 있어
+        # 빈 텍스트 후보는 제외하고 confidence 최대값을 고른다
+        candidates = [a for a in alts if a.get("text", "").strip()]
+        if not candidates:
+            return ""
         def score(a):
             return a.get("confidence", 0.0)
-        best = max(alts, key=score)
+        best = max(candidates, key=score)
         return best.get("text", "")
 
     words = result.get("result")

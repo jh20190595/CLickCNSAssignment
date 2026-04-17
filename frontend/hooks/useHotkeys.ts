@@ -29,17 +29,34 @@ export function parseCombo(combo: string): {
   return { ...mods, key };
 }
 
+function keyFromCode(code: string): string | null {
+  if (code.startsWith("Key")) return code.slice(3);
+  if (code.startsWith("Digit")) return code.slice(5);
+  const map: Record<string, string> = {
+    Backquote: "`", Minus: "-", Equal: "=",
+    BracketLeft: "[", BracketRight: "]", Backslash: "\\",
+    Semicolon: ";", Quote: "'", Comma: ",", Period: ".", Slash: "/",
+    Space: "Space", Enter: "Enter", Tab: "Tab", Backspace: "Backspace",
+    Delete: "Delete", Escape: "Escape",
+    ArrowUp: "ArrowUp", ArrowDown: "ArrowDown",
+    ArrowLeft: "ArrowLeft", ArrowRight: "ArrowRight",
+  };
+  if (map[code]) return map[code];
+  if (code.startsWith("F") && /^F\d+$/.test(code)) return code;
+  return null;
+}
+
 export function serializeEvent(e: KeyboardEvent): string | null {
   const parts: string[] = [];
   if (e.ctrlKey) parts.push("Ctrl");
   if (e.altKey) parts.push("Alt");
   if (e.shiftKey) parts.push("Shift");
   if (e.metaKey) parts.push("Meta");
-  const raw = e.key;
-  if (!raw || ["Control", "Alt", "Shift", "Meta"].includes(raw)) return null;
-  const key = raw.length === 1 ? raw.toUpperCase() : raw;
+  if (["Control", "Alt", "Shift", "Meta"].includes(e.key)) return null;
+  const key = keyFromCode(e.code);
+  if (!key) return null;
   parts.push(key);
-  if (parts.length < 2) return null; // 수식키 없는 단일 키는 무시
+  if (parts.length < 2) return null;
   return parts.join("+");
 }
 
@@ -58,7 +75,9 @@ function matches(combo: string, e: KeyboardEvent): boolean {
   if (parsed.alt !== e.altKey) return false;
   if (parsed.shift !== e.shiftKey) return false;
   if (parsed.meta !== e.metaKey) return false;
-  return parsed.key.toLowerCase() === e.key.toLowerCase();
+  const physical = keyFromCode(e.code);
+  if (physical && physical.toLowerCase() === parsed.key) return true;
+  return parsed.key === e.key.toLowerCase();
 }
 
 export function useHotkeys(bindings: HotkeyMap, options: Options = {}) {

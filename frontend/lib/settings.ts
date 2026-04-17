@@ -2,19 +2,13 @@ const STORAGE_KEY = "soap.settings.v1";
 const CHANGE_EVENT = "soap.settings.change";
 
 export type DateFormat = "korean" | "iso" | "dot" | "english";
-export type NumberSeparator = "." | ")" | "-";
 export type VoiceAction = "stop" | "newline";
-
-export type NumberCallOptions = {
-  enabled: boolean;
-  separator: NumberSeparator;
-  autoNewline: boolean;
-  smallNumber: boolean;
-};
+export type ThemeMode = "light" | "dark";
 
 export type PostprocessSettings = {
-  numberCall: NumberCallOptions;
   dateFormat: DateFormat;
+  /** LLM으로 화자(의사/환자) 라벨링 수행 여부. 추가 LLM 호출 비용 발생. */
+  speakerLabel: boolean;
 };
 
 export type AudioSettings = {
@@ -31,9 +25,15 @@ export type VoiceCommandSettings = {
 export type ShortcutSettings = {
   toggleRecord: string;
   newline: string;
+  copyCC: string;
+  copyS: string;
+  copyO: string;
+  copyA: string;
+  copyP: string;
 };
 
 export type AppSettings = {
+  theme: ThemeMode;
   postprocess: PostprocessSettings;
   audio: AudioSettings;
   voiceCommands: VoiceCommandSettings;
@@ -41,14 +41,10 @@ export type AppSettings = {
 };
 
 export const DEFAULT_SETTINGS: AppSettings = {
+  theme: "light",
   postprocess: {
-    numberCall: {
-      enabled: false,
-      separator: ".",
-      autoNewline: true,
-      smallNumber: false,
-    },
     dateFormat: "korean",
+    speakerLabel: false,
   },
   audio: {
     deviceId: null,
@@ -62,6 +58,11 @@ export const DEFAULT_SETTINGS: AppSettings = {
   shortcuts: {
     toggleRecord: "Ctrl+Shift+R",
     newline: "Ctrl+Enter",
+    copyCC: "Meta+Shift+C",
+    copyS: "Meta+1",
+    copyO: "Meta+2",
+    copyA: "Meta+3",
+    copyP: "Meta+4",
   },
 };
 

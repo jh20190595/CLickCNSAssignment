@@ -1,38 +1,66 @@
 {
   "name": "stt-desktop",
-  "version": "1.0.0",
-  "description": "한국어 음성 텍스트 변환 데스크탑 앱",
+  "version": "1.0.2",
+  "description": "한국어 음성 SOAP 진료 기록 데스크탑 앱",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
-    "build:win": "electron-builder --win --x64",
-    "build:mac": "electron-builder --mac",
-    "build:linux": "electron-builder --linux"
+    "prebuild": "node scripts/prepare-resources.js",
+    "build:win": "node scripts/prepare-resources.js && electron-builder --win --x64",
+    "build:mac": "node scripts/prepare-resources.js && electron-builder --mac",
+    "build:linux": "node scripts/prepare-resources.js && electron-builder --linux"
   },
   "build": {
     "appId": "com.stt.desktop",
-    "productName": "음성 텍스트 변환기",
+    "productName": "ClickCNS",
     "directories": {
       "output": "dist"
     },
     "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
+      "target": "nsis"
     },
     "mac": {
-      "target": "dmg",
-      "icon": "assets/icon.icns"
+      "target": ["dmg", "zip"]
     },
     "linux": {
       "target": "AppImage"
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "jh20190595",
+      "repo": "CLickCNSAssignment"
+    },
     "files": [
-      "src/**",
-      "assets/**"
-    ]
+      "src/**"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/backend",
+        "to": "backend"
+      },
+      {
+        "from": "resources/frontend",
+        "to": "frontend"
+      },
+      {
+        "from": "resources/python",
+        "to": "python"
+      },
+      {
+        "from": "resources/model",
+        "to": "model"
+      }
+    ],
+    "asar": true
   },
-  "dependencies": {},
+  "dependencies": {
+    "electron-updater": "^6.8.3"
+  },
   "devDependencies": {
     "electron": "^33.0.0",
     "electron-builder": "^25.0.0"
