@@ -1,0 +1,69 @@
+name: Build Desktop (Windows)
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install backend deps
+        run: npm ci
+        working-directory: backend
+
+      - name: Install frontend deps
+        run: npm ci
+        working-directory: frontend
+
+      - name: Install desktop deps
+        run: npm ci
+        working-directory: desktop
+
+      - name: Download Vosk model
+        shell: pwsh
+        run: |
+          $modelDir = "backend/model"
+          New-Item -ItemType Directory -Force -Path $modelDir
+          $zipFile = "vosk-model.zip"
+          Invoke-WebRequest -Uri "https://alphacephei.com/vosk/models/vosk-model-small-ko-0.22.zip" -OutFile $zipFile
+          Expand-Archive -Path $zipFile -DestinationPath $modelDir -Force
+          $extracted = Get-ChildItem "$modelDir/vosk-model-small-ko-0.22" -Directory
+          if (Test-Path "$modelDir/vosk-model-small-ko-0.22") {
+            Get-ChildItem "$modelDir/vosk-model-small-ko-0.22" | Move-Item -Destination $modelDir -Force
+            Remove-Item "$modelDir/vosk-model-small-ko-0.22" -Force
+          }
+          Remove-Item $zipFile
+
+      - name: Build & publish
+        run: npm run build:win
+        working-directory: desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to release
+        if: github.event_name == 'release'
+        shell: bash
+        run: |
+          tag="${{ github.event.release.tag_name }}"
+          for f in desktop/dist/*.exe desktop/dist/*.yml; do
+            [ -f "$f" ] && gh release upload "$tag" "$f" --clobber
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifacts (manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-win
+          path: |
+            desktop/dist/*.exe
+            desktop/dist/*.yml
