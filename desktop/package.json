@@ -1,6 +1,6 @@
 {
   "name": "stt-desktop",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "한국어 음성 SOAP 진료 기록 데스크탑 앱",
   "main": "src/main.js",
   "scripts": {
@@ -28,7 +28,8 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "publish": {
       "provider": "github",
