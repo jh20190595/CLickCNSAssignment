@@ -109,11 +109,22 @@ async function preparePython() {
 }
 
 async function main() {
-  // Clean previous resources
+  // Clean previous resources, but preserve pre-downloaded files
+  const vcRedistPreserve = path.join(RESOURCES, 'vc_redist.x64.exe');
+  const hadVcRedist = fs.existsSync(vcRedistPreserve);
+  let vcRedistTmp = null;
+  if (hadVcRedist) {
+    vcRedistTmp = path.join(DESKTOP, 'tmp_vc_redist.x64.exe');
+    fs.copyFileSync(vcRedistPreserve, vcRedistTmp);
+  }
   if (fs.existsSync(RESOURCES)) {
     fs.rmSync(RESOURCES, { recursive: true });
   }
   fs.mkdirSync(RESOURCES, { recursive: true });
+  if (vcRedistTmp && fs.existsSync(vcRedistTmp)) {
+    fs.copyFileSync(vcRedistTmp, vcRedistPreserve);
+    fs.unlinkSync(vcRedistTmp);
+  }
 
   // ── 1. Build backend ──
   console.log('\n=== Building backend ===');
@@ -170,11 +181,15 @@ async function main() {
     console.warn('WARNING: Vosk model not found at backend/model/. STT will be disabled.');
   }
 
-  // ── 5. Download VC++ Redistributable ──
-  console.log('\n=== Downloading VC++ Redistributable ===');
+  // ── 5. VC++ Redistributable ──
   const vcRedistDest = path.join(RESOURCES, 'vc_redist.x64.exe');
-  await download(VCREDIST_URL, vcRedistDest);
-  console.log('VC++ Redistributable downloaded.');
+  if (fs.existsSync(vcRedistDest)) {
+    console.log('\n=== VC++ Redistributable already present, skipping download ===');
+  } else {
+    console.log('\n=== Downloading VC++ Redistributable ===');
+    await download(VCREDIST_URL, vcRedistDest);
+    console.log('VC++ Redistributable downloaded.');
+  }
 
   console.log('\n=== All resources prepared ===');
 }

@@ -45,6 +45,13 @@ jobs:
           }
           Remove-Item $zipFile
 
+      - name: Download VC++ Redistributable
+        shell: pwsh
+        run: |
+          $vcRedistDir = "desktop/resources"
+          New-Item -ItemType Directory -Force -Path $vcRedistDir
+          Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "$vcRedistDir/vc_redist.x64.exe"
+
       - name: Build
         run: npm run build:win
         working-directory: desktop
