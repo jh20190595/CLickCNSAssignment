@@ -7,7 +7,7 @@
     "start": "electron .",
     "dev": "electron . --dev",
     "prebuild": "node scripts/prepare-resources.js",
-    "build:win": "node scripts/prepare-resources.js && electron-builder --win --x64",
+    "build:win": "node scripts/prepare-resources.js && electron-builder --win --x64 --publish never",
     "build:mac": "node scripts/prepare-resources.js && electron-builder --mac",
     "build:linux": "node scripts/prepare-resources.js && electron-builder --linux"
   },
