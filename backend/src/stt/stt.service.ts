@@ -5,6 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { spawn, ChildProcess } from 'child_process';
+import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
 
@@ -47,6 +48,11 @@ export class SttService implements OnModuleInit, OnModuleDestroy {
     onSegment: (text: string) => void,
   ) {
     if (this.sessions.has(clientId)) return;
+
+    if (!fs.existsSync(WORKER_SCRIPT)) {
+      this.logger.error(`STT worker script not found: ${WORKER_SCRIPT}`);
+      throw new Error(`STT worker script not found: ${WORKER_SCRIPT}`);
+    }
 
     const worker = spawn(PYTHON_CMD, [WORKER_SCRIPT], {
       env: { ...process.env, VOSK_MODEL_PATH: MODEL_PATH },

@@ -38,16 +38,21 @@ export class SttGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client connected: ${client.id}`);
     this.segments.set(client.id, []);
     this.sessionOptions.set(client.id, {});
-    this.sttService.initRecognizer(
-      client.id,
-      (text) => {
-        client.emit('transcript_partial', { text });
-      },
-      (text) => {
-        this.segments.get(client.id)?.push(text);
-        client.emit('transcript_final', { text });
-      },
-    );
+    try {
+      this.sttService.initRecognizer(
+        client.id,
+        (text) => {
+          client.emit('transcript_partial', { text });
+        },
+        (text) => {
+          this.segments.get(client.id)?.push(text);
+          client.emit('transcript_final', { text });
+        },
+      );
+    } catch (e) {
+      console.error(`STT init failed for ${client.id}: ${e instanceof Error ? e.message : String(e)}`);
+      client.emit('stt_error', { message: 'Speech recognition unavailable' });
+    }
   }
 
   handleDisconnect(client: Socket) {

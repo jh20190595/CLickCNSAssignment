@@ -130,10 +130,11 @@ async function main() {
   run('npm ci --omit=dev', backendRes);
 
   // Copy stt_worker.py
-  const workerSrc = path.join(backendDir, 'src', 'stt_worker.py');
-  if (fs.existsSync(workerSrc)) {
-    fs.copyFileSync(workerSrc, path.join(backendRes, 'stt_worker.py'));
+  const workerSrc = path.join(backendDir, 'src', 'stt', 'stt_worker.py');
+  if (!fs.existsSync(workerSrc)) {
+    throw new Error(`STT worker not found at ${workerSrc}`);
   }
+  fs.copyFileSync(workerSrc, path.join(backendRes, 'stt_worker.py'));
 
   // ── 2. Build frontend ──
   console.log('\n=== Building frontend ===');
