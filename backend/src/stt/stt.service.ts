@@ -12,7 +12,7 @@ import * as readline from 'readline';
 const MODEL_PATH =
   process.env.VOSK_MODEL_PATH ?? path.join(process.cwd(), 'model');
 const WORKER_SCRIPT =
-  process.env.STT_WORKER_PATH ?? path.join(process.cwd(), 'stt_worker.py');
+  process.env.STT_WORKER_PATH ?? path.join(process.cwd(), 'src', 'stt', 'stt_worker.py');
 const PYTHON_CMD =
   process.env.BUNDLED_PYTHON ?? (process.platform === 'win32' ? 'python' : 'python3');
 
