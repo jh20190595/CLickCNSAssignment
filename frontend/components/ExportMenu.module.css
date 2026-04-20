@@ -1,0 +1,73 @@
+.wrapper {
+  position: relative;
+}
+
+.button {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.button:hover {
+  background-color: #f8fafc;
+}
+
+:global(.dark) .button {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+:global(.dark) .button:hover {
+  background-color: #334155;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  margin-bottom: 0.5rem;
+  width: 11rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  padding: 0.25rem 0;
+  z-index: 10;
+}
+
+:global(.dark) .dropdown {
+  background-color: #0f172a;
+  border-color: #334155;
+}
+
+.menuItem {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #334155;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.menuItem:hover {
+  background-color: #f8fafc;
+}
+
+:global(.dark) .menuItem {
+  color: #e2e8f0;
+}
+
+:global(.dark) .menuItem:hover {
+  background-color: #1e293b;
+}

@@ -3,17 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import type { AppSettings, DateFormat, ShortcutSettings, ThemeMode } from "@/lib/settings";
 import { serializeEvent } from "@/hooks/useHotkeys";
+import styles from "./SettingsModal.module.css";
 
 type Tab = "theme" | "postprocess" | "audio" | "commands" | "shortcuts";
 
 interface Props {
-  /** true면 모달 렌더. false면 null 반환해 언마운트 */
   open: boolean;
-  /** 현재 앱 설정 스냅샷. useSettings의 외부 스토어와 연결된 값 */
   settings: AppSettings;
-  /** 설정 변경 즉시 호출 (디바운스 없음). saveSettings 까지 이어짐 */
   onChange: (next: AppSettings) => void;
-  /** 배경 클릭 / ✕ / Esc 키에 연결 */
   onClose: () => void;
 }
 
@@ -41,47 +38,43 @@ export function SettingsModal({ open, settings, onChange, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40"
+      className={styles.overlay}
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg shadow-xl w-[720px] max-w-[92vw] max-h-[86vh] overflow-hidden flex dark:bg-slate-900 dark:border dark:border-slate-700"
+        className={styles.modal}
         onClick={(e) => e.stopPropagation()}
       >
-        <aside className="w-44 border-r border-slate-200 bg-slate-50 py-3 flex flex-col dark:bg-slate-950 dark:border-slate-800">
-          <div className="px-3 pb-2 text-xs font-semibold text-slate-500 tracking-wide dark:text-slate-400">
+        <aside className={styles.sidebar}>
+          <div className={styles.sidebarTitle}>
             설정
           </div>
-          <nav className="flex flex-col flex-1">
+          <nav className={styles.sidebarNav}>
             {TABS.map((t) => (
               <button
                 key={t.id}
                 type="button"
                 onClick={() => setTab(t.id)}
-                className={`text-left px-4 py-2 text-sm transition ${
-                  tab === t.id
-                    ? "bg-white text-slate-900 font-medium border-l-2 border-blue-500 dark:bg-slate-900 dark:text-slate-100"
-                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
-                }`}
+                className={tab === t.id ? styles.tabActive : styles.tabInactive}
               >
                 {t.label}
               </button>
             ))}
           </nav>
-          <div className="px-4 py-2 text-[11px] text-slate-400 dark:text-slate-500">
+          <div className={styles.version}>
             v{process.env.NEXT_PUBLIC_APP_VERSION ?? "dev"}
           </div>
         </aside>
 
-        <section className="flex-1 overflow-y-auto p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">
+        <section className={styles.content}>
+          <div className={styles.headerRow}>
+            <h2 className={styles.title}>
               {TABS.find((t) => t.id === tab)?.label}
             </h2>
             <button
               type="button"
               onClick={onClose}
-              className="text-slate-400 hover:text-slate-700 text-sm dark:hover:text-slate-200"
+              className={styles.closeButton}
               aria-label="닫기"
             >
               ✕
@@ -117,12 +110,12 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mb-6">
-      <div className="text-sm font-semibold text-slate-800 mb-1 dark:text-slate-100">{title}</div>
+    <div className={styles.sectionWrapper}>
+      <div className={styles.sectionTitle}>{title}</div>
       {description && (
-        <div className="text-xs text-slate-500 mb-3 dark:text-slate-400">{description}</div>
+        <div className={styles.sectionDescription}>{description}</div>
       )}
-      <div className="space-y-3">{children}</div>
+      <div className={styles.sectionChildren}>{children}</div>
     </div>
   );
 }
@@ -137,12 +130,12 @@ function Toggle({
   label: string;
 }) {
   return (
-    <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer select-none dark:text-slate-200">
+    <label className={styles.toggleLabel}>
       <input
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="w-4 h-4 accent-blue-600"
+        className={styles.checkbox}
       />
       {label}
     </label>
@@ -167,29 +160,25 @@ function ThemeTab({
       title="외관 테마"
       description="앱 전반에 적용됩니다. 변경은 즉시 반영되고 설정은 브라우저에 저장됩니다."
     >
-      <div className="grid grid-cols-2 gap-2">
+      <div className={styles.themeGrid}>
         {options.map(({ v, label, hint }) => (
           <label
             key={v}
-            className={`flex flex-col gap-1 border rounded px-3 py-2.5 text-sm cursor-pointer transition ${
-              settings.theme === v
-                ? "border-blue-500 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-400"
-                : "border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800/40"
-            }`}
+            className={settings.theme === v ? styles.cardActive : styles.cardInactive}
           >
-            <div className="flex items-center gap-2">
+            <div className={styles.radioRow}>
               <input
                 type="radio"
                 name="theme"
                 checked={settings.theme === v}
                 onChange={() => setTheme(v)}
-                className="accent-blue-600"
+                className={styles.radio}
               />
-              <span className="font-medium text-slate-800 dark:text-slate-100">
+              <span className={styles.labelText}>
                 {label}
               </span>
             </div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 pl-6">
+            <span className={styles.hint}>
               {hint}
             </span>
           </label>
@@ -235,7 +224,7 @@ function PostprocessTab({
         title="날짜 형식"
         description="연·월·일이 모두 인식됐을 때 이 형식으로 출력됩니다."
       >
-        <div className="grid grid-cols-2 gap-2">
+        <div className={styles.themeGrid}>
           {(
             [
               { v: "korean", ex: "2026년 4월 16일" },
@@ -246,20 +235,20 @@ function PostprocessTab({
           ).map(({ v, ex }) => (
             <label
               key={v}
-              className={`flex items-center gap-2 border rounded px-3 py-2 text-sm cursor-pointer transition ${
+              className={
                 settings.postprocess.dateFormat === v
-                  ? "border-blue-500 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-400"
-                  : "border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800/40"
-              }`}
+                  ? styles.dateCardActive
+                  : styles.dateCardInactive
+              }
             >
               <input
                 type="radio"
                 name="dateFormat"
                 checked={settings.postprocess.dateFormat === v}
                 onChange={() => setDateFormat(v)}
-                className="accent-blue-600"
+                className={styles.radio}
               />
-              <span className="text-slate-700 font-mono dark:text-slate-200">{ex}</span>
+              <span className={styles.fontMono}>{ex}</span>
             </label>
           ))}
         </div>
@@ -286,7 +275,6 @@ function AudioTab({
         if (cancelled) return;
         const inputs = list.filter((d) => d.kind === "audioinput");
         setDevices(inputs);
-        // label이 비어있으면 아직 getUserMedia 권한이 없는 상태
         if (inputs.every((d) => !d.label)) setNeedsPermission(true);
       } catch {
         /* ignore */
@@ -331,7 +319,7 @@ function AudioTab({
           <button
             type="button"
             onClick={requestPermission}
-            className="text-xs px-3 py-1.5 rounded border border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+            className={styles.permissionButton}
           >
             마이크 권한 허용하고 목록 불러오기
           </button>
@@ -339,7 +327,7 @@ function AudioTab({
         <select
           value={settings.audio.deviceId ?? ""}
           onChange={(e) => setDevice(e.target.value || null)}
-          className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
+          className={styles.select}
         >
           <option value="">시스템 기본 장치</option>
           {devices.map((d) => (
@@ -354,7 +342,7 @@ function AudioTab({
         title="마이크 게인"
         description="0.5x ~ 3.0x 사이 배율. 녹음 중 실시간으로 반영됩니다."
       >
-        <div className="flex items-center gap-3">
+        <div className={styles.gainRow}>
           <input
             type="range"
             min="0.5"
@@ -362,9 +350,9 @@ function AudioTab({
             step="0.1"
             value={settings.audio.gain}
             onChange={(e) => setGain(Number(e.target.value))}
-            className="flex-1 accent-blue-600"
+            className={styles.range}
           />
-          <span className="text-sm font-mono text-slate-700 w-12 text-right dark:text-slate-200">
+          <span className={styles.gainValue}>
             {settings.audio.gain.toFixed(1)}x
           </span>
         </div>
@@ -395,25 +383,25 @@ function CommandsTab({
           onChange={(v) => update({ enabled: v })}
           label="음성 명령어 사용"
         />
-        <div className={vc.enabled ? "" : "opacity-40 pointer-events-none"}>
-          <div className="flex items-center gap-3 text-sm mt-3">
-            <span className="text-slate-600 w-24 dark:text-slate-300">녹음 종료</span>
+        <div className={vc.enabled ? undefined : styles.disabledWrapper}>
+          <div className={styles.commandRow}>
+            <span className={styles.commandLabel}>녹음 종료</span>
             <input
               type="text"
               value={vc.stopWord}
               onChange={(e) => update({ stopWord: e.target.value })}
               placeholder="녹음 종료"
-              className="flex-1 border border-slate-300 rounded px-2 py-1 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
+              className={styles.commandInput}
             />
           </div>
-          <div className="flex items-center gap-3 text-sm mt-2">
-            <span className="text-slate-600 w-24 dark:text-slate-300">줄바꿈</span>
+          <div className={styles.commandRowSmall}>
+            <span className={styles.commandLabel}>줄바꿈</span>
             <input
               type="text"
               value={vc.newlineWord}
               onChange={(e) => update({ newlineWord: e.target.value })}
               placeholder="다음 줄"
-              className="flex-1 border border-slate-300 rounded px-2 py-1 text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
+              className={styles.commandInput}
             />
           </div>
         </div>
@@ -457,7 +445,6 @@ function ShortcutCapture({
         setRecording(false);
         return;
       }
-      // 수식키 단독 입력은 무시 (조합 완성 대기)
       if (["Control", "Alt", "Shift", "Meta"].includes(e.key)) return;
       const combo = serializeEvent(e);
       if (!combo) {
@@ -480,23 +467,19 @@ function ShortcutCapture({
   }, [recording, onChange]);
 
   return (
-    <div className="flex items-center gap-3 text-sm">
-      <span className="text-slate-600 w-24 dark:text-slate-300">{label}</span>
+    <div className={styles.shortcutRow}>
+      <span className={styles.shortcutLabel}>{label}</span>
       <button
         type="button"
         onClick={() => {
           setRecording((r) => !r);
           setErrMsg(null);
         }}
-        className={`flex-1 border rounded px-3 py-1.5 font-mono text-left transition ${
-          recording
-            ? "border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-400"
-            : "border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-        }`}
+        className={recording ? styles.shortcutButtonRecording : styles.shortcutButtonNormal}
       >
         {recording ? "키 조합을 누르세요... (Esc 취소)" : value || "(설정 안 됨)"}
       </button>
-      {errMsg && <span className="text-xs text-red-500 dark:text-red-400">{errMsg}</span>}
+      {errMsg && <span className={styles.errorText}>{errMsg}</span>}
     </div>
   );
 }

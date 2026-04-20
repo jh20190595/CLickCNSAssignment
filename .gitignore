@@ -8,3 +8,5 @@ model/
 .env.local
 .env
 .claude/
+CLAUDE.md
+TODO.md

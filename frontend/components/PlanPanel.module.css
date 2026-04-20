@@ -1,0 +1,245 @@
+.section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+:global(.dark) .section {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.mainHeader {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+:global(.dark) .mainHeader {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+.mainLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+:global(.dark) .mainLabel {
+  color: #f1f5f9;
+}
+
+.mainHint {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+:global(.dark) .mainHint {
+  color: #94a3b8;
+}
+
+.copyAllBtn {
+  font-size: 0.75rem;
+  color: #64748b;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.copyAllBtn:hover {
+  color: #1e293b;
+}
+
+:global(.dark) .copyAllBtn {
+  color: #94a3b8;
+}
+
+:global(.dark) .copyAllBtn:hover {
+  color: #e2e8f0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: #f1f5f9;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+:global(.dark) .grid {
+  background: #1e293b;
+}
+
+.subCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 11rem;
+  background: white;
+  border-left: 4px solid;
+}
+
+:global(.dark) .subCard {
+  background: #0f172a;
+}
+
+.barMedication {
+  border-left-color: #fbbf24;
+}
+
+:global(.dark) .barMedication {
+  border-left-color: #f59e0b;
+}
+
+.barExam {
+  border-left-color: #38bdf8;
+}
+
+:global(.dark) .barExam {
+  border-left-color: #0ea5e9;
+}
+
+.barEducation {
+  border-left-color: #fb7185;
+}
+
+:global(.dark) .barEducation {
+  border-left-color: #f43f5e;
+}
+
+.barFollowup {
+  border-left-color: #a78bfa;
+}
+
+:global(.dark) .barFollowup {
+  border-left-color: #8b5cf6;
+}
+
+.subHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.375rem 0.75rem;
+}
+
+.headerMedication {
+  background: #fffbeb;
+}
+
+:global(.dark) .headerMedication {
+  background: rgba(120, 53, 15, 0.3);
+}
+
+.headerExam {
+  background: #f0f9ff;
+}
+
+:global(.dark) .headerExam {
+  background: rgba(12, 74, 110, 0.3);
+}
+
+.headerEducation {
+  background: #fff1f2;
+}
+
+:global(.dark) .headerEducation {
+  background: rgba(136, 19, 55, 0.3);
+}
+
+.headerFollowup {
+  background: #f5f3ff;
+}
+
+:global(.dark) .headerFollowup {
+  background: rgba(46, 16, 101, 0.3);
+}
+
+.subLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+:global(.dark) .subLabel {
+  color: #f1f5f9;
+}
+
+.subHint {
+  margin-left: 0.5rem;
+  font-size: 11px;
+  color: #64748b;
+}
+
+:global(.dark) .subHint {
+  color: #94a3b8;
+}
+
+.regenBtn {
+  font-size: 11px;
+  color: #0284c7;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.regenBtn:hover {
+  color: #075985;
+}
+
+.regenBtn:disabled {
+  color: #cbd5e1;
+  cursor: default;
+}
+
+:global(.dark) .regenBtn {
+  color: #38bdf8;
+}
+
+:global(.dark) .regenBtn:hover {
+  color: #7dd3fc;
+}
+
+:global(.dark) .regenBtn:disabled {
+  color: #475569;
+}
+
+.textarea {
+  flex: 1;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+  line-height: 1.625;
+  resize: none;
+  border: none;
+  background: transparent;
+}
+
+.textarea::placeholder {
+  color: #94a3b8;
+}
+
+.textarea:focus {
+  outline: none;
+}
+
+:global(.dark) .textarea {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+:global(.dark) .textarea::placeholder {
+  color: #475569;
+}

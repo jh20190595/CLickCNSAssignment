@@ -1,0 +1,16 @@
+.html {
+  height: 100%;
+}
+
+.body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fc;
+  color: #0f172a;
+}
+
+:global(.dark) .body {
+  background-color: #020617;
+  color: #e2e8f0;
+}

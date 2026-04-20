@@ -13,6 +13,7 @@ import { SoapEditor } from "@/components/SoapEditor";
 import { SessionHistoryPanel } from "@/components/SessionHistoryPanel";
 import { SettingsButton } from "@/components/SettingsButton";
 import { SettingsModal } from "@/components/SettingsModal";
+import styles from "./page.module.css";
 
 type Mode = "idle" | "recording" | "review";
 
@@ -178,14 +179,14 @@ export default function Home() {
       : undefined;
 
   return (
-    <main className="flex-1 flex flex-col">
-      <header className="border-b border-slate-200 bg-white px-6 py-2.5 grid grid-cols-3 items-center dark:bg-slate-900 dark:border-slate-800">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold tracking-tight text-slate-800 dark:text-slate-100">
+    <main className={styles.main}>
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <span className={styles.title}>
             진료 내용
           </span>
         </div>
-        <div className="flex justify-center">
+        <div className={styles.headerCenter}>
           <RecordToggle
             status={status}
             elapsed={elapsed}
@@ -195,7 +196,7 @@ export default function Home() {
             onStop={handleStop}
           />
         </div>
-        <div className="flex justify-end items-center gap-2">
+        <div className={styles.headerRight}>
           <PatientSelector
             selectedPatient={patient}
             onSelect={handlePatientChange}
@@ -212,8 +213,8 @@ export default function Home() {
         onClose={() => setSettingsOpen(false)}
       />
 
-      <div className="flex-1 grid grid-cols-[3fr_1fr] min-h-0">
-        <div className="flex flex-col min-w-0 min-h-0">
+      <div className={styles.contentGrid}>
+        <div className={styles.mainArea}>
           {mode === "idle" && <EmptyState />}
           {mode === "recording" && (
             <RecordingIndicator
@@ -254,10 +255,10 @@ export default function Home() {
 
 function EmptyState() {
   return (
-    <div className="flex-1 flex items-center justify-center px-6">
-      <div className="text-center text-slate-500 dark:text-slate-400">
-        <p className="text-sm">우측 상단에서 환자를 선택하고 녹음을 시작하세요.</p>
-        <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">
+    <div className={styles.emptyContainer}>
+      <div className={styles.emptyText}>
+        <p className={styles.emptyMessage}>우측 상단에서 환자를 선택하고 녹음을 시작하세요.</p>
+        <p className={styles.emptyHint}>
           과거 진료 기록은 우측 사이드바에서 열람할 수 있습니다.
         </p>
       </div>

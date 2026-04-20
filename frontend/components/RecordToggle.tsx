@@ -1,6 +1,7 @@
 "use client";
 
 import type { SttStatus } from "@/hooks/useStt";
+import styles from "./RecordToggle.module.css";
 
 interface RecordToggleProps {
   /** useStt가 노출하는 세션 상태. 라벨/아이콘/클릭 가능 여부 결정 */
@@ -42,21 +43,23 @@ export function RecordToggle({
     else onStart();
   };
 
+  const buttonClass = `${styles.button} ${
+    disabled || isBusy
+      ? styles.disabled
+      : isRecording
+        ? styles.recording
+        : styles.idle
+  }`;
+
   return (
     <button
       onClick={handleClick}
       disabled={disabled || isBusy}
       title={disabled ? disabledReason : undefined}
-      className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full border transition-colors ${
-        disabled || isBusy
-          ? "bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed dark:bg-slate-900 dark:border-slate-800 dark:text-slate-600"
-          : isRecording
-            ? "bg-red-600 hover:bg-red-700 border-red-600 text-white dark:bg-red-500 dark:hover:bg-red-600 dark:border-red-500"
-            : "bg-white hover:bg-slate-50 border-slate-300 text-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
-      }`}
+      className={buttonClass}
     >
       {isRecording ? <StopIcon /> : <MicIcon />}
-      <span className="font-mono text-xs tabular-nums">{label}</span>
+      <span className={styles.label}>{label}</span>
     </button>
   );
 }

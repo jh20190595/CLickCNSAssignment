@@ -8,6 +8,7 @@ import {
   downloadTextFile,
   filenameFor,
 } from "@/lib/exportFormat";
+import styles from "./ExportMenu.module.css";
 
 interface ExportMenuProps {
   /** 파일명(`filenameFor`)과 출력 머리말에 들어갈 환자 정보 */
@@ -61,15 +62,15 @@ export function ExportMenu({ patient, meta, soap, rawTranscript }: ExportMenuPro
   }
 
   return (
-    <div className="relative" ref={ref}>
+    <div className={styles.wrapper} ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="px-3 py-1.5 text-sm bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-md transition-colors dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
+        className={styles.button}
       >
         {copied ? "복사됨" : "내보내기 ▾"}
       </button>
       {open && (
-        <div className="absolute right-0 bottom-full mb-2 w-44 bg-white border border-slate-200 rounded-md shadow-lg py-1 z-10 dark:bg-slate-900 dark:border-slate-700">
+        <div className={styles.dropdown}>
           <MenuItem onClick={copyMarkdown}>전체 복사 (Markdown)</MenuItem>
           <MenuItem onClick={downloadMd}>Markdown 파일</MenuItem>
           <MenuItem onClick={downloadTxt}>TXT 파일</MenuItem>
@@ -91,7 +92,7 @@ function MenuItem({
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors dark:text-slate-200 dark:hover:bg-slate-800"
+      className={styles.menuItem}
     >
       {children}
     </button>

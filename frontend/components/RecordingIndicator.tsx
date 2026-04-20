@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import styles from "./RecordingIndicator.module.css";
 
 interface RecordingIndicatorProps {
   /** true면 키보드 타이핑 감지로 오디오 전송이 일시 멈춘 상태 (주황 점) */
@@ -29,25 +30,23 @@ export function RecordingIndicator({
   }, [finalTexts.length, partialText]);
 
   return (
-    <div className="flex-1 flex flex-col items-center px-6 py-8 select-none min-h-0">
+    <div className={styles.container}>
       {status === "connecting" && (
-        <p className="text-slate-500 dark:text-slate-400 text-sm">마이크 준비 중...</p>
+        <p className={styles.connectingText}>마이크 준비 중...</p>
       )}
       {status === "recording" && (
         <>
-          <div className="flex items-center gap-2">
+          <div className={styles.dotWrapper}>
             <span
-              className={`w-2 h-2 rounded-full ${
-                isPaused ? "bg-amber-500" : "bg-red-500 animate-pulse"
-              }`}
+              className={isPaused ? styles.dotPaused : styles.dotRecording}
             />
-            <span className="text-sm text-slate-700 dark:text-slate-200 font-medium">
+            <span className={styles.statusLabel}>
               {isPaused ? "일시정지 (타이핑 감지)" : "녹음 중"}
             </span>
           </div>
-          <div className="mt-6 w-full max-w-2xl flex-1 overflow-y-auto text-sm text-slate-700 dark:text-slate-200 leading-relaxed space-y-1">
+          <div className={styles.transcriptArea}>
             {finalTexts.length === 0 && !partialText && (
-              <p className="text-xs text-slate-400 dark:text-slate-500 text-center">
+              <p className={styles.emptyHint}>
                 환자와의 대화에 집중하세요
               </p>
             )}
@@ -55,21 +54,21 @@ export function RecordingIndicator({
               <p key={i}>{t}</p>
             ))}
             {partialText && (
-              <p className="text-slate-400 dark:text-slate-500 italic">{partialText}</p>
+              <p className={styles.partialText}>{partialText}</p>
             )}
             <div ref={bottomRef} />
           </div>
         </>
       )}
       {status === "processing" && (
-        <p className="text-slate-500 dark:text-slate-400 text-sm">대화 정리 중...</p>
+        <p className={styles.processingText}>대화 정리 중...</p>
       )}
       {status === "error" && (
-        <div className="text-center space-y-2">
-          <p className="text-red-600 dark:text-red-400 text-sm">{error ?? "오류가 발생했습니다."}</p>
+        <div className={styles.errorContainer}>
+          <p className={styles.errorText}>{error ?? "오류가 발생했습니다."}</p>
           <button
             onClick={() => window.location.reload()}
-            className="text-sm text-slate-500 dark:text-slate-400 underline"
+            className={styles.retryLink}
           >
             다시 시도
           </button>

@@ -1,0 +1,142 @@
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1.5rem;
+  user-select: none;
+  min-height: 0;
+}
+
+.connectingText {
+  color: #64748b;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+:global(.dark) .connectingText {
+  color: #94a3b8;
+}
+
+.dotWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dotPaused {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: #f59e0b;
+}
+
+.dotRecording {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: #ef4444;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.statusLabel {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+:global(.dark) .statusLabel {
+  color: #e2e8f0;
+}
+
+.transcriptArea {
+  margin-top: 1.5rem;
+  width: 100%;
+  max-width: 42rem;
+  flex: 1;
+  overflow-y: auto;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  color: #334155;
+}
+
+.transcriptArea > * + * {
+  margin-top: 0.25rem;
+}
+
+:global(.dark) .transcriptArea {
+  color: #e2e8f0;
+}
+
+.emptyHint {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
+:global(.dark) .emptyHint {
+  color: #64748b;
+}
+
+.partialText {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+:global(.dark) .partialText {
+  color: #64748b;
+}
+
+.processingText {
+  color: #64748b;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+:global(.dark) .processingText {
+  color: #94a3b8;
+}
+
+.errorContainer {
+  text-align: center;
+}
+
+.errorContainer > * + * {
+  margin-top: 0.5rem;
+}
+
+.errorText {
+  color: #dc2626;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+:global(.dark) .errorText {
+  color: #f87171;
+}
+
+.retryLink {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #64748b;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+:global(.dark) .retryLink {
+  color: #94a3b8;
+}

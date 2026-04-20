@@ -1,5 +1,7 @@
 "use client";
 
+import styles from "./SettingsButton.module.css";
+
 interface Props {
   /** 클릭 시 호출 — 상위에서 SettingsModal 열기 */
   onClick: () => void;
@@ -15,7 +17,7 @@ export function SettingsButton({ onClick, disabled }: Props) {
       disabled={disabled}
       aria-label="설정"
       title="설정"
-      className="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 disabled:opacity-40 disabled:cursor-not-allowed transition"
+      className={styles.button}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -25,7 +27,7 @@ export function SettingsButton({ onClick, disabled }: Props) {
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="w-5 h-5"
+        className={styles.icon}
         aria-hidden="true"
       >
         <circle cx="12" cy="12" r="3" />
