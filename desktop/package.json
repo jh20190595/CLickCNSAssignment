@@ -31,11 +31,6 @@
       "allowToChangeInstallationDirectory": true,
       "artifactName": "${productName}-Setup-${version}.${ext}"
     },
-    "publish": {
-      "provider": "github",
-      "owner": "jh20190595",
-      "repo": "CLickCNSAssignment"
-    },
     "files": [
       "src/**"
     ],
