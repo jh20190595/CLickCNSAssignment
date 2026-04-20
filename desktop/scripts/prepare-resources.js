@@ -17,6 +17,15 @@ const PYTHON_VERSION = '3.11.9';
 const PYTHON_ZIP_URL = `https://www.python.org/ftp/python/${PYTHON_VERSION}/python-${PYTHON_VERSION}-embed-amd64.zip`;
 const VOSK_VERSION = '0.3.45';
 const VOSK_WHL_URL = `https://files.pythonhosted.org/packages/py3/v/vosk/vosk-${VOSK_VERSION}-py3-none-win_amd64.whl`;
+const SRT_TARGZ_URL = 'https://files.pythonhosted.org/packages/66/b7/4a1bc231e0681ebf339337b0cd05b91dc6a0d701fa852bb812e244b7a030/srt-3.5.3.tar.gz';
+const VOSK_DEPS_WHLS = [
+  'https://files.pythonhosted.org/packages/16/e1/3079a9ff9b8e11b846c6ac5c8b5bfb7ff225eee721825310c91b3b50304f/tqdm-4.67.3-py3-none-any.whl',
+  'https://files.pythonhosted.org/packages/f9/9b/335f9764261e915ed497fcdeb11df5dfd6f7bf257d4a6a2a686d80da4d54/requests-2.32.3-py3-none-any.whl',
+  'https://files.pythonhosted.org/packages/9a/3c/c17fb3ca2d9c3acff52e30b309f538586f9f5b9c9cf454f3845fc9af4881/certifi-2026.2.25-py3-none-any.whl',
+  'https://files.pythonhosted.org/packages/db/8f/61959034484a4a7c527811f4721e75d02d653a35afb0b6054474d8185d4c/charset_normalizer-3.4.7-py3-none-any.whl',
+  'https://files.pythonhosted.org/packages/0e/61/66938bbb5fc52dbdf84594873d5b51fb1f7c7794e9c0f5bd885f30bc507b/idna-3.11-py3-none-any.whl',
+  'https://files.pythonhosted.org/packages/39/08/aaaad47bc4e9dc8c725e68f9d04865dbcb2052843ff09c97b08904852d84/urllib3-2.6.3-py3-none-any.whl',
+];
 const VCREDIST_URL = 'https://aka.ms/vs/17/release/vc_redist.x64.exe';
 
 function run(cmd, cwd) {
@@ -100,6 +109,29 @@ async function preparePython() {
   fs.mkdirSync(sitePackages, { recursive: true });
   console.log('Extracting vosk wheel...');
   unzipFile(whlFile, sitePackages);
+
+  // Download & install srt (source-only package — just copy srt.py)
+  const srtTarFile = path.join(DESKTOP, 'tmp_srt.tar.gz');
+  if (!fs.existsSync(srtTarFile)) {
+    await download(SRT_TARGZ_URL, srtTarFile);
+  }
+  console.log('Extracting srt...');
+  execSync(`tar xzf "${srtTarFile}" -C "${DESKTOP}"`, { stdio: 'inherit' });
+  fs.copyFileSync(path.join(DESKTOP, 'srt-3.5.3', 'srt.py'), path.join(sitePackages, 'srt.py'));
+  fs.rmSync(path.join(DESKTOP, 'srt-3.5.3'), { recursive: true });
+  fs.unlinkSync(srtTarFile);
+
+  // Download & extract vosk dependency wheels
+  for (const depUrl of VOSK_DEPS_WHLS) {
+    const depName = path.basename(depUrl);
+    const depFile = path.join(DESKTOP, `tmp_${depName}`);
+    if (!fs.existsSync(depFile)) {
+      await download(depUrl, depFile);
+    }
+    console.log(`Extracting ${depName}...`);
+    unzipFile(depFile, sitePackages);
+    fs.unlinkSync(depFile);
+  }
 
   // Cleanup temp files
   fs.unlinkSync(zipFile);

@@ -7,6 +7,11 @@ const { autoUpdater } = require('electron-updater');
 
 const isDev = process.argv.includes('--dev');
 const children = [];
+const serverLogs = [];
+
+function addLog(msg) {
+  serverLogs.push(`[${new Date().toISOString()}] ${msg}`);
+}
 
 function resourcePath(...segments) {
   if (isDev) {
@@ -43,9 +48,23 @@ function spawnNode(args, cwd, extraEnv = {}) {
 
   const proc = spawn(process.execPath, args, { cwd, env, stdio: ['pipe', 'pipe', 'pipe'] });
   const label = path.basename(cwd);
-  proc.stdout.on('data', (d) => console.log(`[${label}] ${d.toString().trim()}`));
-  proc.stderr.on('data', (d) => console.error(`[${label}] ${d.toString().trim()}`));
-  proc.on('error', (e) => console.error(`[${label}] error:`, e.message));
+  proc.stdout.on('data', (d) => {
+    const msg = d.toString().trim();
+    console.log(`[${label}] ${msg}`);
+    addLog(`[${label}:out] ${msg}`);
+  });
+  proc.stderr.on('data', (d) => {
+    const msg = d.toString().trim();
+    console.error(`[${label}] ${msg}`);
+    addLog(`[${label}:err] ${msg}`);
+  });
+  proc.on('error', (e) => {
+    console.error(`[${label}] error:`, e.message);
+    addLog(`[${label}:CRASH] ${e.message}`);
+  });
+  proc.on('exit', (code) => {
+    addLog(`[${label}:EXIT] code=${code}`);
+  });
   children.push(proc);
   return proc;
 }
@@ -57,6 +76,12 @@ function startBackend() {
   const modelDir = resourcePath('model');
   const workerPath = path.join(backendDir, 'stt_worker.py');
 
+  addLog(`backendDir: ${backendDir} exists=${fs.existsSync(backendDir)}`);
+  addLog(`pythonDir: ${pythonDir} exists=${fs.existsSync(pythonDir)}`);
+  addLog(`modelDir: ${modelDir} exists=${fs.existsSync(modelDir)}`);
+  addLog(`workerPath: ${workerPath} exists=${fs.existsSync(workerPath)}`);
+  addLog(`main.js: ${path.join(backendDir, 'dist', 'main.js')} exists=${fs.existsSync(path.join(backendDir, 'dist', 'main.js'))}`);
+
   const extraEnv = {
     VOSK_MODEL_PATH: modelDir,
     STT_WORKER_PATH: workerPath,
@@ -64,6 +89,7 @@ function startBackend() {
 
   if (process.platform === 'win32') {
     const pythonExe = path.join(pythonDir, 'python.exe');
+    addLog(`pythonExe: ${pythonExe} exists=${fs.existsSync(pythonExe)}`);
     extraEnv.BUNDLED_PYTHON = pythonExe;
   }
 
@@ -73,8 +99,11 @@ function startBackend() {
 function startFrontend() {
   if (isDev) return;
   const frontendDir = resourcePath('frontend');
+  const serverJs = path.join(frontendDir, 'server.js');
+  addLog(`frontendDir: ${frontendDir} exists=${fs.existsSync(frontendDir)}`);
+  addLog(`server.js: ${serverJs} exists=${fs.existsSync(serverJs)}`);
   spawnNode(
-    [path.join(frontendDir, 'server.js')],
+    [serverJs],
     frontendDir,
     { PORT: '3002', HOSTNAME: '0.0.0.0' },
   );
@@ -189,6 +218,14 @@ app.whenReady().then(async () => {
       await Promise.all([waitForServer(3001), waitForServer(3002)]);
     } catch (e) {
       console.error('Server start failed:', e.message);
+      addLog(`[TIMEOUT] ${e.message}`);
+      const logText = serverLogs.join('\n');
+      dialog.showMessageBox({
+        type: 'error',
+        title: '서버 시작 실패',
+        message: '백엔드/프론트엔드 서버를 시작하지 못했습니다.',
+        detail: logText.slice(-2000),
+      });
     }
     createWindow();
     setupAutoUpdater();

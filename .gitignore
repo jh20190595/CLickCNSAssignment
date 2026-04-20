@@ -10,3 +10,5 @@ model/
 .claude/
 CLAUDE.md
 TODO.md
+.DS_Store
+desktop-artifact*/
