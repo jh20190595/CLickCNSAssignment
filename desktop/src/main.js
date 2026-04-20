@@ -99,6 +99,13 @@ function createWindow() {
   win.loadURL('http://localhost:3002');
   if (isDev) win.webContents.openDevTools();
   win.setMenu(null);
+
+  // F12로 DevTools 열기
+  win.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'F12') {
+      win.webContents.toggleDevTools();
+    }
+  });
 }
 
 function setupAutoUpdater() {
