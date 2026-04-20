@@ -1,59 +1,53 @@
 .section {
-  background: linear-gradient(to bottom right, #eff6ff, #eef2ff);
-  border: 2px solid #93c5fd;
+  background: white;
+  border: 1px solid #e2e8f0;
   border-radius: 0.75rem;
   overflow: hidden;
 }
 
 :global(.dark) .section {
-  background: linear-gradient(to bottom right, rgba(23, 37, 84, 0.3), rgba(30, 27, 75, 0.3));
-  border-color: #1d4ed8;
+  background: #0f172a;
+  border-color: #334155;
 }
 
 .header {
   padding: 0.5rem 1rem;
-  border-bottom: 1px solid #bfdbfe;
-  background: rgba(255, 255, 255, 0.4);
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 :global(.dark) .header {
-  border-bottom-color: #1e40af;
-  background: rgba(15, 23, 42, 0.4);
+  border-bottom-color: #334155;
+  background: #1e293b;
 }
 
 .label {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #1e3a5f;
+  color: #334155;
   letter-spacing: -0.025em;
 }
 
 :global(.dark) .label {
-  color: #bfdbfe;
+  color: #e2e8f0;
 }
 
 .hint {
   margin-left: 0.5rem;
   font-size: 0.75rem;
-  color: rgba(29, 78, 216, 0.8);
+  color: #94a3b8;
 }
 
 :global(.dark) .hint {
-  color: rgba(96, 165, 250, 0.8);
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  color: #64748b;
 }
 
 .copyBtn {
   font-size: 0.75rem;
-  color: #1d4ed8;
+  color: #64748b;
   background: none;
   border: none;
   cursor: pointer;
@@ -61,59 +55,30 @@
 }
 
 .copyBtn:hover {
-  color: #1e3a5f;
+  color: #334155;
 }
 
 :global(.dark) .copyBtn {
-  color: #93c5fd;
+  color: #94a3b8;
 }
 
 :global(.dark) .copyBtn:hover {
-  color: #dbeafe;
+  color: #e2e8f0;
 }
 
-.regenBtn {
-  font-size: 0.75rem;
-  color: #0369a1;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.regenBtn:hover {
-  color: #0c4a6e;
-}
-
-.regenBtn:disabled {
-  color: #cbd5e1;
-  cursor: default;
-}
-
-:global(.dark) .regenBtn {
-  color: #38bdf8;
-}
-
-:global(.dark) .regenBtn:hover {
-  color: #7dd3fc;
-}
-
-:global(.dark) .regenBtn:disabled {
-  color: #475569;
-}
 
 .input {
   width: 100%;
   padding: 0.75rem 1rem;
   background: transparent;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 500;
-  color: #172554;
+  color: #1e293b;
   border: none;
 }
 
 .input::placeholder {
-  color: #60a5fa;
+  color: #94a3b8;
 }
 
 .input:focus {
@@ -121,9 +86,9 @@
 }
 
 :global(.dark) .input {
-  color: #dbeafe;
+  color: #e2e8f0;
 }
 
 :global(.dark) .input::placeholder {
-  color: #1e40af;
+  color: #475569;
 }

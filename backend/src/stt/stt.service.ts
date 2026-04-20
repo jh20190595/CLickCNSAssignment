@@ -56,7 +56,12 @@ export class SttService implements OnModuleInit, OnModuleDestroy {
     }
 
     const worker = spawn(PYTHON_CMD, [WORKER_SCRIPT], {
-      env: { ...process.env, VOSK_MODEL_PATH: MODEL_PATH },
+      env: {
+        ...process.env,
+        VOSK_MODEL_PATH: MODEL_PATH,
+        PYTHONIOENCODING: 'utf-8',
+        PYTHONUTF8: '1',
+      },
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 

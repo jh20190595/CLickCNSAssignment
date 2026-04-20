@@ -1,6 +1,6 @@
 {
   "name": "stt-desktop",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "한국어 음성 SOAP 진료 기록 데스크탑 앱",
   "main": "src/main.js",
   "scripts": {

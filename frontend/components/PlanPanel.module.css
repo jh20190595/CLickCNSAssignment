@@ -3,6 +3,9 @@
   border: 1px solid #e2e8f0;
   border-radius: 0.75rem;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 :global(.dark) .section {
@@ -66,16 +69,14 @@
 }
 
 .grid {
+  flex: 1;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr 1fr;
   gap: 1px;
   background: #f1f5f9;
-}
-
-@media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  min-height: 0;
+  overflow: auto;
 }
 
 :global(.dark) .grid {
@@ -85,7 +86,7 @@
 .subCard {
   display: flex;
   flex-direction: column;
-  min-height: 11rem;
+  min-height: 0;
   background: white;
   border-left: 4px solid;
 }
@@ -95,35 +96,35 @@
 }
 
 .barMedication {
-  border-left-color: #fbbf24;
+  border-left-color: #cbd5e1;
 }
 
 :global(.dark) .barMedication {
-  border-left-color: #f59e0b;
+  border-left-color: #475569;
 }
 
 .barExam {
-  border-left-color: #38bdf8;
+  border-left-color: #cbd5e1;
 }
 
 :global(.dark) .barExam {
-  border-left-color: #0ea5e9;
+  border-left-color: #475569;
 }
 
 .barEducation {
-  border-left-color: #fb7185;
+  border-left-color: #cbd5e1;
 }
 
 :global(.dark) .barEducation {
-  border-left-color: #f43f5e;
+  border-left-color: #475569;
 }
 
 .barFollowup {
-  border-left-color: #a78bfa;
+  border-left-color: #cbd5e1;
 }
 
 :global(.dark) .barFollowup {
-  border-left-color: #8b5cf6;
+  border-left-color: #475569;
 }
 
 .subHeader {
@@ -134,35 +135,35 @@
 }
 
 .headerMedication {
-  background: #fffbeb;
+  background: #f8fafc;
 }
 
 :global(.dark) .headerMedication {
-  background: rgba(120, 53, 15, 0.3);
+  background: #1e293b;
 }
 
 .headerExam {
-  background: #f0f9ff;
+  background: #f8fafc;
 }
 
 :global(.dark) .headerExam {
-  background: rgba(12, 74, 110, 0.3);
+  background: #1e293b;
 }
 
 .headerEducation {
-  background: #fff1f2;
+  background: #f8fafc;
 }
 
 :global(.dark) .headerEducation {
-  background: rgba(136, 19, 55, 0.3);
+  background: #1e293b;
 }
 
 .headerFollowup {
-  background: #f5f3ff;
+  background: #f8fafc;
 }
 
 :global(.dark) .headerFollowup {
-  background: rgba(46, 16, 101, 0.3);
+  background: #1e293b;
 }
 
 .subLabel {
@@ -187,7 +188,7 @@
 
 .regenBtn {
   font-size: 11px;
-  color: #0284c7;
+  color: #64748b;
   background: none;
   border: none;
   cursor: pointer;
@@ -195,7 +196,7 @@
 }
 
 .regenBtn:hover {
-  color: #075985;
+  color: #334155;
 }
 
 .regenBtn:disabled {
@@ -204,11 +205,11 @@
 }
 
 :global(.dark) .regenBtn {
-  color: #38bdf8;
+  color: #94a3b8;
 }
 
 :global(.dark) .regenBtn:hover {
-  color: #7dd3fc;
+  color: #e2e8f0;
 }
 
 :global(.dark) .regenBtn:disabled {

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import type {
   Patient,
   PlanSections,
@@ -8,24 +8,24 @@ import type {
   Soap,
   Utterance,
   VisitType,
-} from "@/lib/types";
+} from '@/lib/types';
 import {
   EMPTY_PLAN,
   EMPTY_SOAP,
   SPEAKER_KOREAN,
   isSoapEmpty,
-} from "@/lib/types";
-import { classifySoap } from "@/lib/soapClient";
-import { saveSession, updateSession } from "@/lib/sessionStore";
-import { ExportMenu } from "@/components/ExportMenu";
-import { SoapPanel } from "@/components/SoapPanel";
-import { PlanPanel } from "@/components/PlanPanel";
-import { CcCard } from "@/components/CcCard";
-import styles from "./SoapEditor.module.css";
+} from '@/lib/types';
+import { classifySoap } from '@/lib/soapClient';
+import { saveSession, updateSession } from '@/lib/sessionStore';
+import styles from './SoapEditor.module.css';
+import ExportMenu from '@/components/ExportMenu';
+import SoapPanel from '@/components/SoapPanel';
+import PlanPanel from '@/components/PlanPanel';
+import CcCard from '@/components/CcCard';
 
-type ViewMode = "soap-only" | "split";
+type ViewMode = 'soap-only' | 'split';
 
-interface SoapEditorProps {
+interface Props {
   patient: Patient;
   meta: SessionMeta;
   onMetaChange: (m: SessionMeta) => void;
@@ -38,7 +38,7 @@ interface SoapEditorProps {
   onDone: () => void;
 }
 
-export function SoapEditor({
+export default function SoapEditor({
   patient,
   meta,
   onMetaChange,
@@ -49,12 +49,12 @@ export function SoapEditor({
   sessionId,
   onSessionSaved,
   onDone,
-}: SoapEditorProps) {
+}: Props) {
   const hasSegments = Array.isArray(segments) && segments.length > 0;
   const [isClassifying, setIsClassifying] = useState(false);
   const [classifyError, setClassifyError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>("soap-only");
-  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
+  const [viewMode, setViewMode] = useState<ViewMode>('soap-only');
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   useEffect(() => {
     if (!isSoapEmpty(soap) || !rawTranscript) return;
@@ -75,7 +75,7 @@ export function SoapEditor({
       );
       onSoapChange(result);
     } catch (e) {
-      setClassifyError(e instanceof Error ? e.message : "SOAP 분류 실패");
+      setClassifyError(e instanceof Error ? e.message : 'SOAP 분류 실패');
       onSoapChange({ ...EMPTY_SOAP, plan: { ...EMPTY_PLAN } });
     } finally {
       setIsClassifying(false);
@@ -83,20 +83,20 @@ export function SoapEditor({
   }
 
   function updateField(
-    field: "chiefComplaint" | "subjective" | "objective" | "assessment",
+    field: 'chiefComplaint' | 'subjective' | 'objective' | 'assessment',
     value: string,
   ) {
     onSoapChange({ ...soap, [field]: value });
-    setSaveState("idle");
+    setSaveState('idle');
   }
 
   function updatePlanField(field: keyof PlanSections, value: string) {
     onSoapChange({ ...soap, plan: { ...soap.plan, [field]: value } });
-    setSaveState("idle");
+    setSaveState('idle');
   }
 
   function handleSave() {
-    setSaveState("saving");
+    setSaveState('saving');
     if (sessionId) {
       updateSession(sessionId, {
         rawTranscript,
@@ -114,57 +114,44 @@ export function SoapEditor({
       });
       onSessionSaved(id);
     }
-    setSaveState("saved");
-    setTimeout(() => setSaveState("idle"), 1500);
+    setSaveState('saved');
+    setTimeout(() => setSaveState('idle'), 1500);
   }
 
   const soapBody = (
     <div className={styles.soapBody}>
       <CcCard
         value={soap.chiefComplaint}
-        onChange={(v) => updateField("chiefComplaint", v)}
-        onRegenerate={
-          isClassifying ? undefined : () => runClassify(rawTranscript)
-        }
-        regenerateDisabled={isClassifying}
+        onChange={(v) => updateField('chiefComplaint', v)}
       />
 
-      <div className={styles.soapGrid}>
+      <div className={styles.soapQuadrant}>
         <SoapPanel
           label="S — Subjective"
           hint="주관적 정보 (환자 호소, 병력)"
           accent="s"
           value={soap.subjective}
-          onChange={(v) => updateField("subjective", v)}
-          onRegenerate={
-            isClassifying ? undefined : () => runClassify(rawTranscript)
-          }
+          onChange={(v) => updateField('subjective', v)}
         />
         <SoapPanel
           label="O — Objective"
           hint="객관적 정보 (활력징후, 검사 소견)"
           accent="o"
           value={soap.objective}
-          onChange={(v) => updateField("objective", v)}
+          onChange={(v) => updateField('objective', v)}
+        />
+        <SoapPanel
+          label="A — Assessment"
+          hint="평가 (진단, 감별진단)"
+          accent="a"
+          value={soap.assessment}
+          onChange={(v) => updateField('assessment', v)}
+        />
+        <PlanPanel
+          value={soap.plan}
+          onChange={updatePlanField}
         />
       </div>
-
-      <SoapPanel
-        label="A — Assessment"
-        hint="평가 (진단, 감별진단)"
-        accent="a"
-        value={soap.assessment}
-        onChange={(v) => updateField("assessment", v)}
-      />
-
-      <PlanPanel
-        value={soap.plan}
-        onChange={updatePlanField}
-        onRegenerate={
-          isClassifying ? undefined : () => runClassify(rawTranscript)
-        }
-        regenerateDisabled={isClassifying}
-      />
     </div>
   );
 
@@ -173,7 +160,7 @@ export function SoapEditor({
       <div className={styles.topBar}>
         <div className={styles.patientInfo}>
           <span className={styles.patientName}>
-            {patient.name}{" "}
+            {patient.name}{' '}
             <span className={styles.patientCodeSpan}>· {patient.patientCode}</span>
           </span>
           <VisitTypeToggle
@@ -198,7 +185,7 @@ export function SoapEditor({
       </div>
 
       <div className={styles.contentArea}>
-        {viewMode === "split" ? (
+        {viewMode === 'split' ? (
           <div className={styles.splitGrid}>
             <TranscriptPanel
               segments={segments}
@@ -223,10 +210,10 @@ export function SoapEditor({
           />
           <button
             onClick={handleSave}
-            disabled={saveState === "saving"}
+            disabled={saveState === 'saving'}
             className={styles.saveButton}
           >
-            {saveState === "saved" ? "저장됨" : "저장"}
+            {saveState === 'saved' ? '저장됨' : '저장'}
           </button>
           <button
             onClick={onDone}
@@ -248,8 +235,8 @@ function ViewModeToggle({
   onChange: (v: ViewMode) => void;
 }) {
   const options: { v: ViewMode; label: string }[] = [
-    { v: "soap-only", label: "SOAP" },
-    { v: "split", label: "원문 + SOAP" },
+    { v: 'soap-only', label: 'SOAP' },
+    { v: 'split', label: '원문 + SOAP' },
   ];
   return (
     <div className={styles.toggleWrapper}>
@@ -286,7 +273,7 @@ function TranscriptPanel({
     <aside className={styles.transcriptAside}>
       <div className={styles.transcriptHeader}>
         <span className={styles.transcriptHeaderText}>
-          원문 전사{hasSegments ? " · 화자 라벨" : ""}
+          원문 전사{hasSegments ? ' · 화자 라벨' : ''}
         </span>
       </div>
       <div className={styles.transcriptContent}>
@@ -296,7 +283,7 @@ function TranscriptPanel({
               <li key={i} className={styles.segmentItem}>
                 <span
                   className={
-                    seg.speaker === "doctor"
+                    seg.speaker === 'doctor'
                       ? styles.speakerDoctor
                       : styles.speakerPatient
                   }
@@ -305,7 +292,7 @@ function TranscriptPanel({
                 </span>
                 <span
                   className={
-                    seg.speaker === "doctor"
+                    seg.speaker === 'doctor'
                       ? styles.doctorText
                       : styles.patientText
                   }
@@ -340,7 +327,7 @@ function VisitTypeToggle({
 }) {
   return (
     <div className={styles.toggleWrapper}>
-      {(["초진", "재진"] as const).map((v) => (
+      {(['초진', '재진'] as const).map((v) => (
         <button
           key={v}
           onClick={() => onChange(v)}

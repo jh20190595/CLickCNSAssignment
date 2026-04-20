@@ -1,41 +1,39 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import type { Patient, SessionMeta, Soap } from "@/lib/types";
+import { useEffect, useRef, useState } from 'react';
+
+import type { Patient, SessionMeta, Soap } from '@/lib/types';
 import {
   buildMarkdown,
   buildPlainText,
   downloadTextFile,
   filenameFor,
-} from "@/lib/exportFormat";
-import styles from "./ExportMenu.module.css";
+} from '@/lib/exportFormat';
 
-interface ExportMenuProps {
-  /** 파일명(`filenameFor`)과 출력 머리말에 들어갈 환자 정보 */
+import styles from './ExportMenu.module.css';
+
+interface Props {
   patient: Patient;
-  /** 출력에 포함할 초진/재진 + 주증상 */
   meta: SessionMeta;
-  /** 본문이 될 S/O/A/P 값 */
   soap: Soap;
-  /** MD 파일 다운로드 시 말미에 덧붙일 원본 전사 */
   rawTranscript: string;
 }
 
-export function ExportMenu({ patient, meta, soap, rawTranscript }: ExportMenuProps) {
+export default function ExportMenu({ patient, meta, soap, rawTranscript }: Props) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    const onClick = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [open]);
 
-  async function copyMarkdown() {
+  async function handleCopyMarkdown() {
     const md = buildMarkdown(patient, meta, soap);
     await navigator.clipboard.writeText(md);
     setCopied(true);
@@ -43,20 +41,20 @@ export function ExportMenu({ patient, meta, soap, rawTranscript }: ExportMenuPro
     setOpen(false);
   }
 
-  function downloadMd() {
+  function handleDownloadMd() {
     downloadTextFile(
-      filenameFor(patient, "md"),
+      filenameFor(patient, 'md'),
       buildMarkdown(patient, meta, soap, rawTranscript),
-      "text/markdown",
+      'text/markdown',
     );
     setOpen(false);
   }
 
-  function downloadTxt() {
+  function handleDownloadTxt() {
     downloadTextFile(
-      filenameFor(patient, "txt"),
+      filenameFor(patient, 'txt'),
       buildPlainText(patient, meta, soap),
-      "text/plain",
+      'text/plain',
     );
     setOpen(false);
   }
@@ -67,13 +65,13 @@ export function ExportMenu({ patient, meta, soap, rawTranscript }: ExportMenuPro
         onClick={() => setOpen((o) => !o)}
         className={styles.button}
       >
-        {copied ? "복사됨" : "내보내기 ▾"}
+        {copied ? '복사됨' : '내보내기 ▾'}
       </button>
       {open && (
         <div className={styles.dropdown}>
-          <MenuItem onClick={copyMarkdown}>전체 복사 (Markdown)</MenuItem>
-          <MenuItem onClick={downloadMd}>Markdown 파일</MenuItem>
-          <MenuItem onClick={downloadTxt}>TXT 파일</MenuItem>
+          <MenuItem onClick={handleCopyMarkdown}>전체 복사 (Markdown)</MenuItem>
+          <MenuItem onClick={handleDownloadMd}>Markdown 파일</MenuItem>
+          <MenuItem onClick={handleDownloadTxt}>TXT 파일</MenuItem>
         </div>
       )}
     </div>
@@ -84,9 +82,7 @@ function MenuItem({
   onClick,
   children,
 }: {
-  /** 메뉴 항목 클릭 시 호출 (복사/다운로드 액션) */
   onClick: () => void;
-  /** 항목 라벨 텍스트 */
   children: React.ReactNode;
 }) {
   return (

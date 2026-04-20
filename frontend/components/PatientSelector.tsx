@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import type { Patient } from "@/lib/types";
-import { createPatient, deletePatient, searchPatients } from "@/lib/patientStore";
-import { deleteSessionsByPatient } from "@/lib/sessionStore";
-import styles from "./PatientSelector.module.css";
+import { useEffect, useRef, useState } from 'react';
+import type { Patient } from '@/lib/types';
+import { createPatient, deletePatient, searchPatients } from '@/lib/patientStore';
+import { deleteSessionsByPatient } from '@/lib/sessionStore';
+import styles from './PatientSelector.module.css';
 
-interface PatientSelectorProps {
+interface Props {
   selectedPatient: Patient | null;
   onSelect: (patient: Patient | null) => void;
   disabled?: boolean;
 }
 
-export function PatientSelector({
+export default function PatientSelector({
   selectedPatient,
   onSelect,
   disabled,
-}: PatientSelectorProps) {
+}: Props) {
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [results, setResults] = useState<Patient[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -35,14 +35,14 @@ export function PatientSelector({
         setOpen(false);
       }
     };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
   }, [open, showAddModal]);
 
   function handleSelect(p: Patient) {
     onSelect(p);
     setOpen(false);
-    setQuery("");
+    setQuery('');
   }
 
   function handleCreate(name: string, patientCode: string) {
@@ -54,7 +54,7 @@ export function PatientSelector({
   function handleDelete(e: React.MouseEvent, p: Patient) {
     e.stopPropagation();
     const ok = confirm(
-      `"${p.name} (${p.patientCode})" 환자를 삭제합니다.\n이 환자의 모든 진료 기록도 함께 삭제됩니다. 계속할까요?`,
+      `"${p.name} (${p.patientCode})" 환자를 삭제합니다.\n이 환자의 모든 진료 기록도 함께 삭제됩니다. 계속할까요?`
     );
     if (!ok) return;
     deletePatient(p.id);
@@ -93,10 +93,10 @@ export function PatientSelector({
           <div className={styles.dropdown}>
             <div className={styles.searchWrapper}>
               <input
-                type="text"
+                type='text'
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="이름 또는 환자코드 검색"
+                placeholder='이름 또는 환자코드 검색'
                 autoFocus
                 className={styles.searchInput}
               />
@@ -105,7 +105,7 @@ export function PatientSelector({
             <ul className={styles.list}>
               {results.length === 0 ? (
                 <li className={styles.emptyResult}>
-                  {query ? "검색 결과 없음" : "등록된 환자가 없습니다"}
+                  {query ? '검색 결과 없음' : '등록된 환자가 없습니다'}
                 </li>
               ) : (
                 results.map((p) => (
@@ -126,7 +126,7 @@ export function PatientSelector({
                     </button>
                     <button
                       onClick={(e) => handleDelete(e, p)}
-                      aria-label="환자 삭제"
+                      aria-label='환자 삭제'
                       className={styles.deleteButton}
                     >
                       <TrashIcon />
@@ -169,14 +169,14 @@ function NewPatientModal({
   onCancel: () => void;
 }) {
   const [name, setName] = useState(initialName);
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState('');
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel();
+      if (e.key === 'Escape') onCancel();
     };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
   }, [onCancel]);
 
   const canSubmit = name.trim().length > 0 && code.trim().length > 0;
@@ -207,10 +207,10 @@ function NewPatientModal({
           <div className={styles.fieldItem}>
             <label className={styles.label}>이름</label>
             <input
-              type="text"
+              type='text'
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="예: 홍길동"
+              placeholder='예: 홍길동'
               autoFocus
               className={styles.modalInput}
             />
@@ -218,10 +218,10 @@ function NewPatientModal({
           <div className={styles.fieldItem}>
             <label className={styles.label}>환자코드</label>
             <input
-              type="text"
+              type='text'
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="예: P00123"
+              placeholder='예: P00123'
               className={styles.modalInput}
             />
           </div>
@@ -229,14 +229,14 @@ function NewPatientModal({
 
         <div className={styles.buttonRow}>
           <button
-            type="button"
+            type='button'
             onClick={onCancel}
             className={styles.cancelButton}
           >
             취소
           </button>
           <button
-            type="submit"
+            type='submit'
             disabled={!canSubmit}
             className={styles.submitButton}
           >

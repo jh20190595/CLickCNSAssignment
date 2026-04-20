@@ -9,6 +9,8 @@ model/
 .env
 .claude/
 CLAUDE.md
+DEVELOP.md
 TODO.md
 .DS_Store
 desktop-artifact*/
+desktop/resources/

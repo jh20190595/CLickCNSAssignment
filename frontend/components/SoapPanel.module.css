@@ -5,7 +5,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 14rem;
+  min-height: 0;
 }
 
 :global(.dark) .card {
@@ -21,30 +21,27 @@
 }
 
 .cardS {
-  border-color: #a7f3d0;
+  border-color: #e2e8f0;
 }
 
 :global(.dark) .cardS {
-  border-color: #065f46;
+  border-color: #334155;
 }
 
 .cardO {
-  border-color: #ddd6fe;
+  border-color: #e2e8f0;
 }
 
 :global(.dark) .cardO {
-  border-color: #5b21b6;
+  border-color: #334155;
 }
 
 .cardA {
-  border-color: #f9a8d4;
-  border-left: 4px solid #ec4899;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border-color: #e2e8f0;
 }
 
 :global(.dark) .cardA {
-  border-color: #831843;
-  border-left: 4px solid #ec4899;
+  border-color: #334155;
 }
 
 .header {
@@ -66,33 +63,33 @@
 }
 
 .headerS {
-  background: #ecfdf5;
-  border-bottom-color: #d1fae5;
+  background: #f8fafc;
+  border-bottom-color: #f1f5f9;
 }
 
 :global(.dark) .headerS {
-  background: rgba(6, 78, 59, 0.3);
-  border-bottom-color: #064e3b;
+  background: #1e293b;
+  border-bottom-color: #334155;
 }
 
 .headerO {
-  background: #f5f3ff;
-  border-bottom-color: #ede9fe;
+  background: #f8fafc;
+  border-bottom-color: #f1f5f9;
 }
 
 :global(.dark) .headerO {
-  background: rgba(46, 16, 101, 0.3);
-  border-bottom-color: #4c1d95;
+  background: #1e293b;
+  border-bottom-color: #334155;
 }
 
 .headerA {
-  background: #fdf2f8;
-  border-bottom-color: #fce7f3;
+  background: #f8fafc;
+  border-bottom-color: #f1f5f9;
 }
 
 :global(.dark) .headerA {
-  background: rgba(80, 7, 36, 0.3);
-  border-bottom-color: #831843;
+  background: #1e293b;
+  border-bottom-color: #334155;
 }
 
 .label {
@@ -109,28 +106,28 @@
 }
 
 .labelS {
-  color: #065f46;
+  color: #334155;
 }
 
 :global(.dark) .labelS {
-  color: #6ee7b7;
+  color: #e2e8f0;
 }
 
 .labelO {
-  color: #5b21b6;
+  color: #334155;
 }
 
 :global(.dark) .labelO {
-  color: #c4b5fd;
+  color: #e2e8f0;
 }
 
 .labelA {
-  color: #500724;
+  color: #334155;
   font-weight: 700;
 }
 
 :global(.dark) .labelA {
-  color: #f9a8d4;
+  color: #e2e8f0;
 }
 
 .hint {
@@ -147,27 +144,27 @@
 }
 
 .hintS {
-  color: rgba(4, 120, 87, 0.7);
+  color: #94a3b8;
 }
 
 :global(.dark) .hintS {
-  color: rgba(52, 211, 153, 0.7);
+  color: #64748b;
 }
 
 .hintO {
-  color: rgba(109, 40, 217, 0.7);
+  color: #94a3b8;
 }
 
 :global(.dark) .hintO {
-  color: rgba(167, 139, 250, 0.7);
+  color: #64748b;
 }
 
 .hintA {
-  color: rgba(190, 24, 93, 0.8);
+  color: #94a3b8;
 }
 
 :global(.dark) .hintA {
-  color: rgba(244, 114, 182, 0.8);
+  color: #64748b;
 }
 
 .actions {
@@ -200,7 +197,7 @@
 
 .regenBtn {
   font-size: 0.75rem;
-  color: #0284c7;
+  color: #64748b;
   background: none;
   border: none;
   cursor: pointer;
@@ -208,15 +205,15 @@
 }
 
 .regenBtn:hover {
-  color: #075985;
+  color: #334155;
 }
 
 :global(.dark) .regenBtn {
-  color: #38bdf8;
+  color: #94a3b8;
 }
 
 :global(.dark) .regenBtn:hover {
-  color: #7dd3fc;
+  color: #e2e8f0;
 }
 
 .textarea {

@@ -1,42 +1,37 @@
-"use client";
+'use client';
 
-import type { SttStatus } from "@/hooks/useStt";
-import styles from "./RecordToggle.module.css";
+import type { SttStatus } from '@/hooks/useStt';
+import styles from './RecordToggle.module.css';
 
-interface RecordToggleProps {
-  /** useStt가 노출하는 세션 상태. 라벨/아이콘/클릭 가능 여부 결정 */
+interface Props {
   status: SttStatus;
-  /** 녹음 시작 후 경과 초. "mm:ss · 정지" 포맷에 사용 */
   elapsed: number;
-  /** 환자 미선택/리뷰 모드 등 클릭 금지 상태 */
   disabled?: boolean;
-  /** disabled일 때 title 툴팁으로 노출 (예: "먼저 환자를 선택하세요") */
   disabledReason?: string;
-  /** idle 상태에서 클릭 시 호출 — 녹음 시작 */
   onStart: () => void;
-  /** recording 상태에서 클릭 시 호출 — 녹음 정지 */
   onStop: () => void;
 }
 
-export function RecordToggle({
+export default function RecordToggle({
   status,
   elapsed,
   disabled,
   disabledReason,
   onStart,
   onStop,
-}: RecordToggleProps) {
-  const isRecording = status === "recording";
-  const isBusy = status === "connecting" || status === "processing";
+}: Props) {
+  const isRecording = status === 'recording';
+  const isBusy = status === 'connecting' || status === 'processing';
 
   const label = isRecording
     ? `${formatTime(elapsed)} · 정지`
     : isBusy
-      ? status === "connecting"
-        ? "준비 중…"
-        : "처리 중…"
-      : "녹음";
+      ? status === 'connecting'
+        ? '준비 중…'
+        : '처리 중…'
+      : '녹음';
 
+  // 클릭 핸들러
   const handleClick = () => {
     if (disabled || isBusy) return;
     if (isRecording) onStop();
@@ -65,8 +60,8 @@ export function RecordToggle({
 }
 
 function formatTime(sec: number): string {
-  const mm = String(Math.floor(sec / 60)).padStart(2, "0");
-  const ss = String(sec % 60).padStart(2, "0");
+  const mm = String(Math.floor(sec / 60)).padStart(2, '0');
+  const ss = String(sec % 60).padStart(2, '0');
   return `${mm}:${ss}`;
 }
 

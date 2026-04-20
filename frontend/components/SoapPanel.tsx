@@ -1,27 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import styles from "./SoapPanel.module.css";
+import { useState } from 'react';
 
-export type SoapAccent = "s" | "o" | "a";
+import styles from './SoapPanel.module.css';
 
-interface SoapPanelProps {
+export type SoapAccent = 's' | 'o' | 'a';
+
+interface Props {
   label: string;
   hint: string;
   value: string;
   onChange: (v: string) => void;
-  onRegenerate?: () => void;
   accent?: SoapAccent;
 }
 
 const ACCENT_CLASSES: Record<
   SoapAccent,
-  {
-    card: string;
-    header: string;
-    label: string;
-    hint: string;
-  }
+  { card: string; header: string; label: string; hint: string }
 > = {
   s: {
     card: styles.cardS,
@@ -43,15 +38,15 @@ const ACCENT_CLASSES: Record<
   },
 };
 
-export function SoapPanel({
+export default function SoapPanel({
   label,
   hint,
   value,
   onChange,
-  onRegenerate,
   accent,
-}: SoapPanelProps) {
+}: Props) {
   const [copied, setCopied] = useState(false);
+
   const accentStyles = accent
     ? ACCENT_CLASSES[accent]
     : {
@@ -63,11 +58,10 @@ export function SoapPanel({
 
   async function handleCopy() {
     try {
-      await navigator.clipboard.writeText(value ?? "");
+      await navigator.clipboard.writeText(value ?? '');
       setCopied(true);
       setTimeout(() => setCopied(false), 1200);
     } catch {
-      /* clipboard may be unavailable */
     }
   }
 
@@ -82,25 +76,14 @@ export function SoapPanel({
           <span className={`${styles.label} ${accentStyles.label}`}>{label}</span>
           <span className={`${styles.hint} ${accentStyles.hint}`}>{hint}</span>
         </div>
-        <div className={styles.actions}>
-          <button
-            type="button"
-            onClick={handleCopy}
-            title={copied ? "복사됨" : "섹션 복사"}
-            className={styles.copyBtn}
-          >
-            {copied ? "복사됨" : "복사"}
-          </button>
-          {onRegenerate && (
-            <button
-              onClick={onRegenerate}
-              title="이 섹션 재생성"
-              className={styles.regenBtn}
-            >
-              재생성
-            </button>
-          )}
-        </div>
+        <button
+          type="button"
+          onClick={handleCopy}
+          title={copied ? '복사됨' : '섹션 복사'}
+          className={styles.copyBtn}
+        >
+          {copied ? "✓" : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16V4a2 2 0 0 1 2-2h12"/></svg>}
+        </button>
       </div>
       <textarea
         value={value}

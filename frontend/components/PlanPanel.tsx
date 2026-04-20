@@ -1,23 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import type { PlanSections } from "@/lib/types";
-import { PLAN_LABELS } from "@/lib/types";
-import styles from "./PlanPanel.module.css";
+import { useState } from 'react';
 
-interface PlanPanelProps {
+import type { PlanSections } from '@/lib/types';
+import { PLAN_LABELS } from '@/lib/types';
+
+import styles from './PlanPanel.module.css';
+
+interface Props {
   value: PlanSections;
   onChange: (field: keyof PlanSections, value: string) => void;
-  onRegenerate?: (field: keyof PlanSections) => void;
-  regenerateDisabled?: boolean;
   onCopyAll?: () => void;
 }
 
 const HINTS: Record<keyof PlanSections, string> = {
-  medication: "약물명 · 용량 · 용법",
-  exam: "랩 · 영상 · 추가 검사",
-  education: "생활습관 · 주의사항",
-  followup: "재방문 · 리퍼 · 경과 관찰",
+  medication: '약물명 · 용량 · 용법',
+  exam: '랩 · 영상 · 추가 검사',
+  education: '생활습관 · 주의사항',
+  followup: '재방문 · 리퍼 · 경과 관찰',
 };
 
 const ACCENTS: Record<
@@ -43,19 +43,17 @@ const ACCENTS: Record<
 };
 
 const FIELDS: Array<keyof PlanSections> = [
-  "medication",
-  "exam",
-  "education",
-  "followup",
+  'medication',
+  'exam',
+  'education',
+  'followup',
 ];
 
-export function PlanPanel({
+export default function PlanPanel({
   value,
   onChange,
-  onRegenerate,
-  regenerateDisabled,
   onCopyAll,
-}: PlanPanelProps) {
+}: Props) {
   const [copiedAll, setCopiedAll] = useState(false);
 
   async function handleCopyAll() {
@@ -63,14 +61,13 @@ export function PlanPanel({
       onCopyAll();
     } else {
       const text = FIELDS.map((k) =>
-        value[k]?.trim() ? `[${PLAN_LABELS[k]}]\n${value[k].trim()}` : "",
+        value[k]?.trim() ? `[${PLAN_LABELS[k]}]\n${value[k].trim()}` : '',
       )
         .filter(Boolean)
-        .join("\n\n");
+        .join('\n\n');
       try {
         await navigator.clipboard.writeText(text);
       } catch {
-        /* ignore */
       }
     }
     setCopiedAll(true);
@@ -89,10 +86,10 @@ export function PlanPanel({
         <button
           type="button"
           onClick={handleCopyAll}
-          title={copiedAll ? "복사됨" : "Plan 전체 복사"}
+          title={copiedAll ? '복사됨' : 'Plan 전체 복사'}
           className={styles.copyAllBtn}
         >
-          {copiedAll ? "복사됨" : "복사"}
+          {copiedAll ? "✓" : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16V4a2 2 0 0 1 2-2h12"/></svg>}
         </button>
       </div>
       <div className={styles.grid}>
@@ -114,17 +111,6 @@ export function PlanPanel({
                     {HINTS[key]}
                   </span>
                 </div>
-                {onRegenerate && (
-                  <button
-                    type="button"
-                    onClick={() => onRegenerate(key)}
-                    disabled={regenerateDisabled}
-                    title="이 서브섹션 재생성"
-                    className={styles.regenBtn}
-                  >
-                    재생성
-                  </button>
-                )}
               </div>
               <textarea
                 value={value[key]}

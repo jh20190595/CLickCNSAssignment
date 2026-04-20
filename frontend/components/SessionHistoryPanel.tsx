@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import type { Patient, Session } from "@/lib/types";
-import { deleteSession, listSessions } from "@/lib/sessionStore";
-import { getPatient, listPatients } from "@/lib/patientStore";
-import styles from "./SessionHistoryPanel.module.css";
+import { useEffect, useMemo, useState } from 'react';
+import type { Patient, Session } from '@/lib/types';
+import { deleteSession, listSessions } from '@/lib/sessionStore';
+import { getPatient, listPatients } from '@/lib/patientStore';
+import styles from './SessionHistoryPanel.module.css';
 
-interface SessionHistoryPanelProps {
+interface Props {
   patient: Patient | null;
   onOpen: (session: Session) => void;
   onPatientSelect: (patient: Patient | null) => void;
@@ -15,14 +15,14 @@ interface SessionHistoryPanelProps {
   disabled?: boolean;
 }
 
-export function SessionHistoryPanel({
+export default function SessionHistoryPanel({
   patient,
   onOpen,
   onPatientSelect,
   refreshKey,
   activeSessionId,
   disabled,
-}: SessionHistoryPanelProps) {
+}: Props) {
   const [localRefresh, setLocalRefresh] = useState(0);
   const [onlyCurrent, setOnlyCurrent] = useState(true);
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -58,14 +58,14 @@ export function SessionHistoryPanel({
   function handleDelete(e: React.MouseEvent, id: string) {
     e.stopPropagation();
     if (disabled) return;
-    if (!confirm("이 세션을 삭제할까요?")) return;
+    if (!confirm('이 세션을 삭제할까요?')) return;
     deleteSession(id);
     setLocalRefresh((n) => n + 1);
   }
 
   return (
     <aside
-      className={`${styles.aside} ${disabled ? styles.disabled : ""}`}
+      className={`${styles.aside} ${disabled ? styles.disabled : ''}`}
     >
       <div className={styles.header}>
         <h2 className={styles.title}>진료 기록</h2>
@@ -86,15 +86,15 @@ export function SessionHistoryPanel({
         <div className={styles.emptyState}>
           <p className={styles.emptyText}>
             {onlyCurrent
-              ? "이 환자의 진료 기록이 없습니다."
-              : "아직 기록된 진료가 없습니다."}
+              ? '이 환자의 진료 기록이 없습니다.'
+              : '아직 기록된 진료가 없습니다.'}
           </p>
         </div>
       ) : (
         <ul className={styles.list}>
           {visible.map((s) => {
             const isActive = s.id === activeSessionId;
-            const name = patientNameMap.get(s.patientId) ?? "알 수 없음";
+            const name = patientNameMap.get(s.patientId) ?? '알 수 없음';
             return (
               <li
                 key={s.id}
@@ -138,6 +138,6 @@ export function SessionHistoryPanel({
 
 function formatDate(ts: number) {
   const d = new Date(ts);
-  const pad = (n: number) => String(n).padStart(2, "0");
+  const pad = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
