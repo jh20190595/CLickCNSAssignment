@@ -78,6 +78,24 @@ export class SttGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: Buffer,
   ) {
+    if (!this.sttService.hasSession(client.id)) {
+      // Worker가 죽었으면 자동 재시작 시도
+      try {
+        this.sttService.initRecognizer(
+          client.id,
+          (text) => client.emit('transcript_partial', { text }),
+          (text) => {
+            this.segments.get(client.id)?.push(text);
+            client.emit('transcript_final', { text });
+          },
+          (message) => client.emit('stt_error', { message }),
+        );
+        console.log(`Worker respawned for ${client.id}`);
+      } catch (e) {
+        client.emit('stt_error', { message: 'STT worker is not running. Please restart the app.' });
+        return;
+      }
+    }
     this.sttService.sendChunk(client.id, Buffer.from(data));
   }
 

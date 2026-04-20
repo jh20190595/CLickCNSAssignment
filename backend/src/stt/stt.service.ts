@@ -100,6 +100,10 @@ export class SttService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
+  hasSession(clientId: string): boolean {
+    return this.sessions.has(clientId);
+  }
+
   sendChunk(clientId: string, data: Buffer): void {
     const session = this.sessions.get(clientId);
     if (!session?.process.stdin) return;
