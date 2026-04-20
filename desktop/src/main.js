@@ -103,6 +103,11 @@ function createWindow() {
 function setupAutoUpdater() {
   if (isDev) return;
 
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'jh20190595',
+    repo: 'CLickCNSAssignment',
+  });
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
 
