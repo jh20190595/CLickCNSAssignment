@@ -17,6 +17,7 @@ const PYTHON_VERSION = '3.11.9';
 const PYTHON_ZIP_URL = `https://www.python.org/ftp/python/${PYTHON_VERSION}/python-${PYTHON_VERSION}-embed-amd64.zip`;
 const VOSK_VERSION = '0.3.45';
 const VOSK_WHL_URL = `https://files.pythonhosted.org/packages/py3/v/vosk/vosk-${VOSK_VERSION}-py3-none-win_amd64.whl`;
+const VCREDIST_URL = 'https://aka.ms/vs/17/release/vc_redist.x64.exe';
 
 function run(cmd, cwd) {
   console.log(`\n> [${path.basename(cwd)}] ${cmd}`);
@@ -168,6 +169,12 @@ async function main() {
   } else {
     console.warn('WARNING: Vosk model not found at backend/model/. STT will be disabled.');
   }
+
+  // ── 5. Download VC++ Redistributable ──
+  console.log('\n=== Downloading VC++ Redistributable ===');
+  const vcRedistDest = path.join(RESOURCES, 'vc_redist.x64.exe');
+  await download(VCREDIST_URL, vcRedistDest);
+  console.log('VC++ Redistributable downloaded.');
 
   console.log('\n=== All resources prepared ===');
 }

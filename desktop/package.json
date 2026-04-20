@@ -50,6 +50,10 @@
       {
         "from": "resources/model",
         "to": "model"
+      },
+      {
+        "from": "resources/vc_redist.x64.exe",
+        "to": "vc_redist.x64.exe"
       }
     ],
     "asar": true

@@ -1,6 +1,7 @@
 const { app, BrowserWindow, dialog } = require('electron');
 const path = require('path');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
+const fs = require('fs');
 const http = require('http');
 const { autoUpdater } = require('electron-updater');
 
@@ -153,10 +154,28 @@ function setupAutoUpdater() {
   autoUpdater.checkForUpdates();
 }
 
+function installVCRedist() {
+  if (isDev || process.platform !== 'win32') return;
+  const marker = path.join(app.getPath('userData'), '.vcredist_installed');
+  if (fs.existsSync(marker)) return;
+  const vcRedist = path.join(process.resourcesPath, 'vc_redist.x64.exe');
+  if (!fs.existsSync(vcRedist)) return;
+  try {
+    console.log('Installing VC++ Redistributable...');
+    execSync(`"${vcRedist}" /install /quiet /norestart`, { timeout: 60000 });
+    fs.writeFileSync(marker, new Date().toISOString());
+    console.log('VC++ Redistributable installed.');
+  } catch (e) {
+    console.error('VC++ install failed (may already be installed):', e.message);
+    fs.writeFileSync(marker, 'skipped');
+  }
+}
+
 app.whenReady().then(async () => {
   if (isDev) {
     createWindow();
   } else {
+    installVCRedist();
     startBackend();
     startFrontend();
     try {
