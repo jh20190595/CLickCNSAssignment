@@ -81,15 +81,22 @@ def pick_best_text(result: dict) -> str:
 def main():
     try:
         from vosk import Model, KaldiRecognizer
-    except ImportError:
-        log("vosk not installed")
-        emit({"type": "error", "text": "vosk not available"})
+    except ImportError as e:
+        log(f"vosk import failed: {e}")
+        emit({"type": "error", "text": f"vosk import failed: {e}"})
+        sys.exit(1)
+    except Exception as e:
+        log(f"vosk load error: {e}")
+        emit({"type": "error", "text": f"vosk load error: {e}"})
         sys.exit(1)
 
     if not os.path.exists(MODEL_PATH):
         log(f"Model not found at {MODEL_PATH}")
-        emit({"type": "error", "text": "model not found"})
+        emit({"type": "error", "text": f"model not found at {MODEL_PATH}"})
         sys.exit(1)
+
+    model_files = os.listdir(MODEL_PATH)
+    log(f"Model dir contents: {model_files}")
 
     log(
         f"Loading model from {MODEL_PATH} "

@@ -87,15 +87,18 @@ export class SttService implements OnModuleInit, OnModuleDestroy {
       }
     });
 
-    worker.stderr.on('data', (d: Buffer) =>
-      this.logger.debug(`[worker:${clientId}] ${d.toString().trim()}`),
-    );
+    let lastStderr = '';
+    worker.stderr.on('data', (d: Buffer) => {
+      const msg = d.toString().trim();
+      this.logger.debug(`[worker:${clientId}] ${msg}`);
+      lastStderr = msg;
+    });
 
     worker.on('exit', (code) => {
-      this.logger.warn(`Worker exited [${clientId}] code=${code}`);
+      this.logger.warn(`Worker exited [${clientId}] code=${code} stderr=${lastStderr}`);
       this.sessions.delete(clientId);
       if (code !== 0 && onError) {
-        onError(`STT worker crashed (code=${code})`);
+        onError(lastStderr || `STT worker crashed (code=${code})`);
       }
     });
   }
