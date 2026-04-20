@@ -95,6 +95,11 @@ export function useStt(options: UseSttOptions = {}) {
       setError("서버에 연결할 수 없습니다.");
     });
 
+    socket.on("stt_error", ({ message }: { message: string }) => {
+      setStatus("error");
+      setError(message || "음성 인식을 사용할 수 없습니다.");
+    });
+
     socket.on("transcript_partial", ({ text }: { text: string }) => {
       console.warn("[stt] <- partial:", JSON.stringify(text));
       const t = text ?? "";

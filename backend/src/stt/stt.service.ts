@@ -46,6 +46,7 @@ export class SttService implements OnModuleInit, OnModuleDestroy {
     clientId: string,
     onPartial: (text: string) => void,
     onSegment: (text: string) => void,
+    onError?: (message: string) => void,
   ) {
     if (this.sessions.has(clientId)) return;
 
@@ -93,6 +94,9 @@ export class SttService implements OnModuleInit, OnModuleDestroy {
     worker.on('exit', (code) => {
       this.logger.warn(`Worker exited [${clientId}] code=${code}`);
       this.sessions.delete(clientId);
+      if (code !== 0 && onError) {
+        onError(`STT worker crashed (code=${code})`);
+      }
     });
   }
 

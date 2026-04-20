@@ -48,6 +48,9 @@ export class SttGateway implements OnGatewayConnection, OnGatewayDisconnect {
           this.segments.get(client.id)?.push(text);
           client.emit('transcript_final', { text });
         },
+        (message) => {
+          client.emit('stt_error', { message });
+        },
       );
     } catch (e) {
       console.error(`STT init failed for ${client.id}: ${e instanceof Error ? e.message : String(e)}`);
